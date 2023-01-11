@@ -20,6 +20,11 @@ import '../../components/sw-credits.js';
 class SimpleLayout extends LitElement {
   static get styles() {
     return css`
+      :host {
+        display: block;
+        min-height: 100vh;
+      }
+
       :host > div {
         padding: 20px;
       }

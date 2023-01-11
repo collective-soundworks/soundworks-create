@@ -11,40 +11,34 @@ import createLayout from './views/layout.js';
 // - Wizard & Tools:        `npx soundworks`
 
 async function bootstrap() {
-  try {
-    /**
-     * Load configuration from config files and create the soundworks client
-     */
-    const config = loadConfig(process.env.ENV, import.meta.url);
-    const client = new Client(config);
+  /**
+   * Load configuration from config files and create the soundworks client
+   */
+  const config = loadConfig(process.env.ENV, import.meta.url);
+  const client = new Client(config);
 
-    /**
-     * Register some soundworks plugins
-     * you will need to install the plugins before hand, run `npx soundworks` for help
-     */
-    // client.pluginManager.register('platform', pluginPlatform, { audioContext });
+  /**
+   * Register some soundworks plugins
+   * you will need to install the plugins before hand, run `npx soundworks` for help
+   */
+  // client.pluginManager.register('platform', pluginPlatform, { audioContext });
 
-    /**
-     * Register the soundworks client into the launcher
-     *
-     * Automatically restarts the process when the socket closes or when an
-     * uncaught error occurs in the program.
-     */
-    launcher.register(client);
+  /**
+   * Register the soundworks client into the launcher
+   *
+   * Automatically restarts the process when the socket closes or when an
+   * uncaught error occurs in the program.
+   */
+  launcher.register(client);
 
-    /**
-     * Launch application
-     */
-    await client.start();
+  /**
+   * Launch application
+   */
+  await client.start();
 
-    // create application layout (which mimics lit API) and do your own stuff!
-
-    /* eslint-disable-next-line no-unused-vars */
-    const $layout = createLayout(client);
-
-  } catch(err) {
-    console.error(err);
-  }
+  // create application layout (which mimics lit API)
+  const $layout = createLayout(client);
+  // ...and do your own stuff!
 }
 
 // The launcher allows to fork multiple clients in the same terminal window

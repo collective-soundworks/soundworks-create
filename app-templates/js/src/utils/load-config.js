@@ -37,10 +37,6 @@ export function loadConfig(ENV = 'default', callerURL = null) {
 
   try {
     env = JSON5.parse(fs.readFileSync(envConfigFilepath, 'utf-8'));
-
-    if (process.env.PORT) {
-      env.port = process.env.PORT;
-    }
   } catch(err) {
     console.info('');
     console.info('--------------------------------------------------------');
@@ -49,7 +45,12 @@ export function loadConfig(ENV = 'default', callerURL = null) {
     console.info(DEFAULT_ENV_CONFIG);
     console.info('- hint: run `npx soundworks --create-config` to create a dedicated config file');
     console.info('--------------------------------------------------------');
+
     env = DEFAULT_ENV_CONFIG;
+  }
+
+  if (process.env.PORT) {
+    env.port = process.env.PORT;
   }
 
   // parse app config

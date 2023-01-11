@@ -19,6 +19,11 @@ import '../../components/sw-audit.js';
 class ControllerLayout extends LitElement {
   static get styles() {
     return css`
+      :host {
+        display: block;
+        min-height: 100vh;
+      }
+
       :host > div {
         padding: 20px;
       }

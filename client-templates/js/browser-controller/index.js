@@ -12,24 +12,21 @@ import createLayout from './views/layout.js';
 const config = window.SOUNDWORKS_CONFIG;
 
 async function main($container) {
-  try {
-    const client = new Client(config);
+  const client = new Client(config);
 
-    // client.pluginManager.register(pluginName, pluginFactory, {options}, [dependencies])
+  launcher.register(client, {
+    initScreensContainer: $container,
+    reloadOnVisibilityChange: false,
+  });
 
-    launcher.register(client, {
-      initScreensContainer: $container,
-      reloadOnVisibilityChange: false,
-    });
+  await client.start();
 
-    await client.start();
+  const $layout = createLayout(client, $container);
 
-    /* eslint-disable-next-line no-unused-vars */
-    const $layout = createLayout(client, $container);
-
-  } catch(err) {
-    console.error(err);
-  }
+  // ...
 }
 
-launcher.execute(main);
+launcher.execute(main, {
+  numClients: parseInt(new URLSearchParams(window.location.search).get('emulate')) || 1,
+  width: '50%',
+});
