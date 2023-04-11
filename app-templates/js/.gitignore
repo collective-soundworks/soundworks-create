@@ -5,7 +5,7 @@
 .data
 
 # ignore all environement config files
-/config/env/*
+/config/env-*
 
 # junk files
 package-lock.json
