@@ -2,7 +2,7 @@
 
 Interactive command line tools to create and manage soundworks application
 
-*__WARNING: The `@soundworks/create` package targets `soundworks#v4` which is still under heavy development.__*
+*__WARNING: The `@soundworks/create` package targets `soundworks#v4` which is under heavy development.__*
 
 ## Tutorial
 
