@@ -1,6 +1,6 @@
 import { LitElement, html, render, css } from 'lit';
 
-import '../../components/sw-audit.js';
+import '../components/sw-audit.js';
 
 /**
  * This layout is provided for convenience, feel free to edit or even
@@ -17,41 +17,16 @@ import '../../components/sw-audit.js';
  * setInterval(() => $layout.requestUpdate(), 1000);
  */
 class ControllerLayout extends LitElement {
-  static get styles() {
-    return css`
-      :host {
-        display: block;
-        min-height: 100vh;
-      }
-
-      :host > div {
-        padding: 20px;
-      }
-
-      header {
-        display: block;
-        height: 38px;
-        line-height: 38px;
-        background-color: #121212;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        border-bottom: 1px solid #343434;
-      }
-
-      header h1 {
-        font-size: 12px;
-        margin: 0;
-        padding-left: 20px;
-      }
-    `;
-  }
-
   constructor() {
     super();
 
     this.client = null;
     this._components = new Set();
+  }
+
+  // no shadow DOM
+  createRenderRoot() {
+    return this;
   }
 
   // comp can be either a string or is anything that have a `render` method
@@ -94,4 +69,5 @@ export default function createLayout(client, $container) {
 
   return $layout;
 }
+
 
