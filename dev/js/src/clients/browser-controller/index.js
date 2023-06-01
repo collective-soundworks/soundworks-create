@@ -2,7 +2,9 @@ import '@soundworks/helpers/polyfills.js';
 import { Client } from '@soundworks/core/client.js';
 import launcher from '@soundworks/helpers/launcher.js';
 
-import createLayout from './views/layout.js';
+import createLayout from './layout.js';
+
+// import { html } from 'lit';
 
 // - General documentation: https://soundworks.dev/
 // - API documentation:     https://soundworks.dev/api
@@ -24,6 +26,11 @@ async function main($container) {
   const $layout = createLayout(client, $container);
 
   // ...
+  // $layout.addComponent(html`<h1>ok</h1>`);
+
+  // setTimeout(() => {
+  //   console.log($layout.querySelector('h1'));
+  // }, 100);
 }
 
 launcher.execute(main, {
