@@ -2,7 +2,7 @@
 
 [![npm version](https://badge.fury.io/js/@soundworks%2Fcreate.svg)](https://badge.fury.io/js/@soundworks%2Fcreate)
 
-Interactive command line tools to create and manage [soundworks](https://soundworks.dev) application.
+Interactive command line tools to create and manage [soundworks](https://soundworks.dev) applications.
 
 _Tutorial_: [https://soundworks.dev/tutorials/getting-started.html](https://soundworks.dev/tutorials/getting-started.html)
 

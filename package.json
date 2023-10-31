@@ -1,15 +1,12 @@
 {
   "name": "@soundworks/create",
+  "version": "1.0.0-alpha.16",
+  "description": "Interactive command line tools to create and manage soundworks applications."
   "authors": [
     "Benjamin Matuszewski"
   ],
-  "version": "1.0.0-alpha.16",
-  "description": "",
   "license": "BSD-3-Clause",
   "type": "module",
-  "publishConfig": {
-    "access": "public"
-  },
   "bin": {
     "create": "create.js",
     "soundworks": "wizard.js"
@@ -18,6 +15,17 @@
     "lint": "eslint",
     "preversion": ". export.sh && git add -A && git commit --allow-empty -m 'updated templates'"
   },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/collective-soundworks/soundworks-create"
+  },
+  "bugs": {
+    "url": "https://github.com/collective-soundworks/soundworks-create/issues"
+  },
+  "homepage": "https://soundworks.dev",
   "dependencies": {
     "chalk": "^5.2.0",
     "commander": "^10.0.0",
