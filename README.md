@@ -1,31 +1,50 @@
-# `@soundworks/create`
+# soundworks | create
 
-Interactive command line tools to create and manage soundworks application
+[![npm version](https://badge.fury.io/js/@soundworks%2Fcreate.svg)](https://badge.fury.io/js/@soundworks%2Fcreate)
 
-*__WARNING: The `@soundworks/create` package targets `soundworks#v4` which is under heavy development.__*
+Interactive command line tools to create and manage [soundworks](https://soundworks.dev) application.
 
-## Tutorial
-
-[https://soundworks.dev/guides/getting-started.html](https://soundworks.dev/guides/getting-started.html)
+_Tutorial_: [https://soundworks.dev/tutorials/getting-started.html](https://soundworks.dev/tutorials/getting-started.html)
 
 ## Usage
 
-### Create a new soundworks application
+### Application generator
 
 ```sh
 npx @soundworks/create@latest
 ```
 
-### Use the wizard inside an existing application
+### Wizard in existing applications
 
 ```sh
 npx soundworks
 ```
 
-## Todos
+## Notes
 
-- typescript template
-- new client templates (connection screen, etc.)
+### Development notes
+
+To develop the application generator locally:
+
+```sh
+// link globally
+// in `soundworks-create` directory:
+npm link
+// to create an app
+npx @soundworks/create
+// unlink globally
+npm unlink --global @soundworks/create
+npm ls --global
+```
+
+### Todos
+
+- [ ] typescript template
+- [ ] new client templates (connection screen, etc.)
+
+## Credits
+
+[https://soundworks.dev/credits.html](https://soundworks.dev/credits.html)
 
 ## License
 
