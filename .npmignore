@@ -7,8 +7,9 @@ Thumbs.db
 dev
 
 # these files are required for the wizard
+#
+# note 31-10-2023: there seems to be no way to force `.gitignore` and `.npmrc`
+# files to be included in the package
+
 !build-tools/.eslintrc
-!app-templates/**/.gitignore
 !app-templates/**/.editorconfig
-
-

@@ -13,9 +13,6 @@ import JSON5 from 'json5';
 
 import { toValidPackageName, ignoreFiles, onCancel } from './lib/utils.js';
 
-// console.log('coucou');
-// process.exit(0);
-
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 const { version } = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json')));
 
@@ -134,13 +131,15 @@ for (let src of files) {
       fs.writeFileSync(dest, readme);
       break;
     }
-    // npm has weird behavior regarding .gitignore files which are automatically
-    // transformed .npmignore
-    case '.npmignore': {
-      const gitignore = path.join(targetWorkingDir, '.gitignore');
-      fs.copyFileSync(src, gitignore);
-      break;
-    }
+    // npm has a weird behavior regarding `.gitignore` files which are
+    // automatically renamed to `.npmignore`.
+    // Note 31-10-2023: the .gitignore and .npmrc files seems to be completely
+    // removed from the package altogether, test w/ `npm pack` and check
+    // case '.npmignore': {
+    //   const gitignore = path.join(targetWorkingDir, '.gitignore');
+    //   fs.copyFileSync(src, gitignore);
+    //   break;
+    // }
     // just copy the file without modification
     default: {
       fs.copyFileSync(src, dest);
@@ -148,6 +147,33 @@ for (let src of files) {
     }
   }
 }
+
+// create .gitignore file
+const gitignore = `\
+# transpiled files and dependencies
+/node_modules
+# application build files
+.build
+.data
+
+# ignore all environment config files
+/config/env-*
+
+# junk files
+package-lock.json
+.DS_Store
+Thumbs.db
+
+# TLS certificates
+/**/*.pem
+`;
+
+fs.writeFileSync(path.join(targetWorkingDir, '.gitignore'), gitignore);
+
+// create .npmrc file
+const npmrc = `package-lock=false`;
+
+fs.writeFileSync(path.join(targetWorkingDir, '.npmrc'), npmrc);
 
 if (options.eslint === true) {
   const src = path.join(__dirname, 'build-tools', '.eslintrc');

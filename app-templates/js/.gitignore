@@ -1,10 +1,13 @@
+# WARNING: this file is not included in published package and is therefore
+# manually written in `create.js` script, any change should be reported accordingly
+
 # transpiled files and dependencies
 /node_modules
 # application build files
 .build
 .data
 
-# ignore all environement config files
+# ignore all environment config files
 /config/env-*
 
 # junk files
