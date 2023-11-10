@@ -2,9 +2,8 @@ import '@soundworks/helpers/polyfills.js';
 import { Client } from '@soundworks/core/client.js';
 import launcher from '@soundworks/helpers/launcher.js';
 
-import createLayout from './layout.js';
-
-// import { html } from 'lit';
+import { html, render } from 'lit';
+import '../components/sw-audit.js';
 
 // - General documentation: https://soundworks.dev/
 // - API documentation:     https://soundworks.dev/api
@@ -23,14 +22,17 @@ async function main($container) {
 
   await client.start();
 
-  const $layout = createLayout(client, $container);
-
-  // ...
-  // $layout.addComponent(html`<h1>ok</h1>`);
-
-  // setTimeout(() => {
-  //   console.log($layout.querySelector('h1'));
-  // }, 100);
+  render(html`
+    <div class="controller-layout">
+      <header>
+        <h1>${client.config.app.name} | ${client.role}</h1>
+        <sw-audit .client="${client}"></sw-audit>
+      </header>
+      <section>
+        <p>Hello ${client.config.app.name}!</p>
+      </section>
+    </div>
+  `, $container);
 }
 
 launcher.execute(main, {

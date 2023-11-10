@@ -6,7 +6,9 @@
 // If you want to only apply some plugins and presets to the webpack bundles and
 // not to the node processes files (which generally do not need this), you should
 // apply the changes to the `babel-loader` plugin in the `webpack.config.js` file
-export default function(_api) {
+export default function(api) {
+  api.cache(true);
+
   const presets = [];
   const plugins = [];
 

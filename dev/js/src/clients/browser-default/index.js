@@ -2,7 +2,8 @@ import '@soundworks/helpers/polyfills.js';
 import { Client } from '@soundworks/core/client.js';
 import launcher from '@soundworks/helpers/launcher.js';
 
-import createLayout from './layout.js';
+import { html, render } from 'lit';
+import '../components/sw-credits.js';
 
 // - General documentation: https://soundworks.dev/
 // - API documentation:     https://soundworks.dev/api
@@ -57,12 +58,13 @@ async function main($container) {
    */
   await client.start();
 
-  // The `$layout` is provided as a convenience and is not required by soundworks,
-  // its full source code is located in the `./views/layout.js` file, so feel free
-  // to edit it to match your needs or even to delete it.
-  const $layout = createLayout(client, $container);
+  render(html`
+    <div class="simple-layout">
+      <p>Hello ${client.config.app.name}!</p>
 
-  // do your own stuff!
+      <sw-credits .infos="${client.config.app}"></sw-credits>
+    </div>
+  `, $container);
 }
 
 // The launcher enables instanciation of multiple clients in the same page to

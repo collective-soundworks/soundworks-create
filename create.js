@@ -6,8 +6,8 @@ import path from 'node:path';
 import * as url from 'node:url';
 
 import chalk from 'chalk';
+import { mkdirp } from 'mkdirp';
 import prompts from 'prompts';
-import mkdirp from 'mkdirp';
 import readdir from 'recursive-readdir';
 import JSON5 from 'json5';
 
@@ -15,6 +15,13 @@ import { toValidPackageName, ignoreFiles, onCancel } from './lib/utils.js';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 const { version } = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json')));
+
+let debug = false; // will link itself at the end of the installation
+
+if (process.argv[2] == '--debug' || process.argv[3] == '--debug') {
+  console.log(chalk.yellow('> Run create in debug mode'));
+  debug = true;
+}
 
 console.log(`\
 ${chalk.gray(`[@soundworks/create#v${version}]`)}
@@ -24,11 +31,6 @@ ${chalk.yellow('> welcome to soundworks')}
 - documentation: ${chalk.cyan('https://soundworks.dev')}
 - issues: ${chalk.cyan('https://github.com/collective-soundworks/soundworks/issues')}
 `);
-
-let debug = false; // will link itself at the end of the installation
-if (process.argv[2] == '--debug' || process.argv[3] == '--debug') {
-  debug = true;
-}
 
 let targetDir;
 if (process.argv[2] && process.argv[2] !== '--debug') {

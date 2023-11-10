@@ -3,7 +3,6 @@ import { Client } from '@soundworks/core/client.js';
 import launcher from '@soundworks/helpers/launcher.js';
 
 import { loadConfig } from '../../utils/load-config.js';
-import createLayout from './layout.js';
 
 // - General documentation: https://soundworks.dev/
 // - API documentation:     https://soundworks.dev/api
@@ -36,10 +35,7 @@ async function bootstrap() {
    */
   await client.start();
 
-  // create application layout (which mimics the client-side API)
-  const $layout = createLayout(client);
-
-  // ...and do your own stuff!
+  console.log(`Hello ${client.config.app.name}!`);
 }
 
 // The launcher allows to fork multiple clients in the same terminal window
