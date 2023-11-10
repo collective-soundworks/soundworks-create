@@ -1,6 +1,6 @@
 {
   "name": "@soundworks/create",
-  "version": "1.0.0-alpha.16",
+  "version": "1.0.0-alpha.17",
   "description": "Interactive command line tools to create and manage soundworks applications.",
   "authors": [
     "Benjamin Matuszewski"
