@@ -53,7 +53,8 @@ if (targetDir === '.') {
   }
 }
 
-const targetWorkingDir = path.normalize(path.join(process.cwd(), targetDir));
+const targetWorkingDir = path.isAbsolute(targetDir) ?
+  targetDir : path.normalize(path.join(process.cwd(), targetDir));
 
 if (fs.existsSync(targetWorkingDir) && fs.readdirSync(targetWorkingDir).length > 0) {
   console.log(chalk.red(`> "${targetDir}" directory exists and is not empty, aborting...`));
