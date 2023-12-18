@@ -22,17 +22,21 @@ async function main($container) {
 
   await client.start();
 
-  render(html`
-    <div class="controller-layout">
-      <header>
-        <h1>${client.config.app.name} | ${client.role}</h1>
-        <sw-audit .client="${client}"></sw-audit>
-      </header>
-      <section>
-        <p>Hello ${client.config.app.name}!</p>
-      </section>
-    </div>
-  `, $container);
+  function renderApp() {
+    render(html`
+      <div class="controller-layout">
+        <header>
+          <h1>${client.config.app.name} | ${client.role}</h1>
+          <sw-audit .client="${client}"></sw-audit>
+        </header>
+        <section>
+          <p>Hello ${client.config.app.name}!</p>
+        </section>
+      </div>
+    `, $container);
+  }
+
+  renderApp();
 }
 
 launcher.execute(main, {
