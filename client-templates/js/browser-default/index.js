@@ -58,13 +58,17 @@ async function main($container) {
    */
   await client.start();
 
-  render(html`
-    <div class="simple-layout">
-      <p>Hello ${client.config.app.name}!</p>
+  function renderApp() {
+    render(html`
+      <div class="simple-layout">
+        <p>Hello ${client.config.app.name}!</p>
 
-      <sw-credits .infos="${client.config.app}"></sw-credits>
-    </div>
-  `, $container);
+        <sw-credits .infos="${client.config.app}"></sw-credits>
+      </div>
+    `, $container);
+  }
+
+  renderApp();
 }
 
 // The launcher enables instanciation of multiple clients in the same page to
