@@ -8,10 +8,8 @@
   "private": true,
   "scripts": {
     "build": "npm run clean && sass src/clients/styles:.build/public/css && soundworks-build -b",
-    "build:production": "npm run clean && sass src/clients/styles:.build/public/css && soundworks-build -b -m",
     "clean": "soundworks-build -D",
     "dev": "npm run build && (concurrently -i -p \"none\" \"npm run watch:inspect server\" \"soundworks-build -b -w\" \"npm run watch:sass\")",
-    "postinstall": "soundworks-build -C",
     "start": "node .build/server/index.js",
     "watch": "soundworks-build -p",
     "watch:inspect": "soundworks-build -d -p",
