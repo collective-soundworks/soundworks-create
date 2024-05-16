@@ -18,6 +18,8 @@ const { version } = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.jso
 
 let debug = false; // will link itself at the end of the installation
 
+console.log('+++++++ COUCOU +++++++');
+
 if (process.argv[2] == '--debug' || process.argv[3] == '--debug') {
   console.log(chalk.yellow('> Run create in debug mode'));
   debug = true;
@@ -65,32 +67,6 @@ const templatesDir = path.join(__dirname, 'app-templates');
 // const templatesMetas = JSON.parse(fs.readFileSync(path.join(templatesDir, 'metas.json')));
 
 const options = {};
-
-// @todo - reconsider asking these questions when we have the typescript template ready
-
-// const options = await prompts([
-//   // {
-//   //   type: 'select',
-//   //   name: 'template',
-//   //   message: 'Choose a soundworks app template?',
-//   //   choices: Object.entries(templatesMetas).map(([dir, infos]) => {
-//   //     return {
-//   //       title: infos.description,
-//   //       value: dir,
-//   //     };
-//   //   }),
-//   // },
-//   {
-//     type: 'toggle',
-//     name: 'eslint',
-//     message: 'Install eslint?',
-//     initial: true,
-//     active: 'yes',
-//     inactive: 'no',
-//   },
-//   // @todo - choose language
-// ], { onCancel });
-
 options.name = path.basename(targetWorkingDir);
 options.eslint = true;
 options.language = 'js';
@@ -134,15 +110,13 @@ for (let src of files) {
       fs.writeFileSync(dest, readme);
       break;
     }
+
     // npm has a weird behavior regarding `.gitignore` files which are
     // automatically renamed to `.npmignore`.
     // Note 31-10-2023: the .gitignore and .npmrc files seems to be completely
-    // removed from the package altogether, test w/ `npm pack` and check
-    // case '.npmignore': {
-    //   const gitignore = path.join(targetWorkingDir, '.gitignore');
-    //   fs.copyFileSync(src, gitignore);
-    //   break;
-    // }
+    // removed from the package altogether (test w/ `npm pack`).
+    // So we are just re-creating them from scratch later
+
     // just copy the file without modification
     default: {
       fs.copyFileSync(src, dest);
@@ -153,9 +127,8 @@ for (let src of files) {
 
 // create .gitignore file
 const gitignore = `\
-# transpiled files and dependencies
+# build files and dependencies
 /node_modules
-# application build files
 .build
 .data
 

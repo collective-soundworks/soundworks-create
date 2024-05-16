@@ -12,7 +12,6 @@ import { installPlugins, installLibs } from './lib/package-installer.js';
 import { findDoc } from './lib/find-doc.js';
 import { configInfos } from './lib/config-infos.js';
 import { createEnv } from './lib/create-env.js';
-import { extendBuild } from './lib/extend-build.js';
 import { ejectLauncher } from './lib/eject-launcher.js';
 import { checkDeps } from './lib/check-deps.js';
 
@@ -25,12 +24,27 @@ const tasks = {
   findDoc,
   configInfos,
   createEnv,
-  extendBuild,
   ejectLauncher,
   checkDeps,
 };
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+
+// allow to trigger specific taks from command line
+program
+  .option('-c, --create-client', 'create a new soundworks client')
+  .option('-p, --install-plugins', 'install / uninstall soundworks plugins')
+  .option('-l, --install-libs', 'install / uninstall related libs')
+  .option('-f, --find-doc', 'find documentation about plugins and related libs')
+  .option('-i, --config-infos', 'get config informations about you application')
+  .option('-C, --create-env', 'create a new environment config file')
+  .option('-e, --eject-launcher', 'eject the launcher and default views from `@soundworks/helpers`')
+  .option('-d, --check-deps', 'check and update your dependencies')
+  .addOption(new Option('-i, --init').hideHelp()) // launched by @soundworks/create
+;
+
+program.parse(process.argv);
+const options = program.opts();
 
 if (!fs.existsSync(path.join(process.cwd(), '.soundworks'))) {
   console.error(chalk.red(`\
@@ -46,23 +60,6 @@ const appInfos = JSON.parse(fs.readFileSync(path.join(process.cwd(), '.soundwork
 const { version } = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json')));
 console.log(chalk.gray(`[@soundworks/wizard#v${version}]`));
 console.log('');
-
-// allow to trigger specific taks from command line
-program
-  .option('-c, --create-client', 'create a new soundworks client')
-  .option('-p, --install-plugins', 'install / uninstall soundworks plugins')
-  .option('-l, --install-libs', 'install / uninstall related libs')
-  .option('-f, --find-doc', 'find documentation about plugins and related libs')
-  .option('-i, --config-infos', 'get config informations about you application')
-  .option('-C, --create-env', 'create a new environment config file')
-  .option('-b, --extend-build', 'extend the build settings (babel, webpack) of your project')
-  .option('-e, --eject-launcher', 'eject the launcher and default views from `@soundworks/helpers`')
-  .option('-d, --check-deps', 'check and update your dependencies')
-  .addOption(new Option('-i, --init').hideHelp()) // launched by @soundworks/create
-;
-
-program.parse(process.argv);
-const options = program.opts();
 
 // init wizard, called by @soundworks/create
 if (options.init) {
@@ -110,14 +107,10 @@ ${chalk.grey(`- you can exit the wizard at any moment by typing Ctrl+C or by cho
           { title: 'install / uninstall soundworks plugins', value: 'installPlugins' },
           { title: 'install / uninstall related libs', value: 'installLibs' },
           { title: 'find documentation about plugins and libs', value: 'findDoc' },
-
           { title: 'get config informations about you application', value: 'configInfos' },
           { title: 'create a new environment config file', value: 'createEnv' },
-
-          { title: 'extend the build settings (babel, webpack) of your project', value: 'extendBuild' },
           { title: 'eject the launcher and default init views', value: 'ejectLauncher' },
           { title: 'check and update your dependencies', value: 'checkDeps' },
-          // { title: 'start your application', value: 'startApp' }, (?)
           { title: '→ exit', value: 'exit' },
         ],
       },

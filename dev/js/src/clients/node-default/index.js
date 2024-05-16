@@ -1,4 +1,4 @@
-import '@soundworks/helpers/polyfills.js';
+// import '@soundworks/helpers/polyfills.js';
 import { Client } from '@soundworks/core/client.js';
 import launcher from '@soundworks/helpers/launcher.js';
 

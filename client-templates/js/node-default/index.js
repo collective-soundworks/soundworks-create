@@ -1,4 +1,4 @@
-import '@soundworks/helpers/polyfills.js';
+// import '@soundworks/helpers/polyfills.js';
 import { Client } from '@soundworks/core/client.js';
 import launcher from '@soundworks/helpers/launcher.js';
 
@@ -40,7 +40,7 @@ async function bootstrap() {
 
 // The launcher allows to fork multiple clients in the same terminal window
 // by defining the `EMULATE` env process variable
-// e.g. `EMULATE=10 npm run watch-process thing` to run 10 clients side-by-side
+// e.g. `EMULATE=10 npm run watch thing` to run 10 clients side-by-side
 launcher.execute(bootstrap, {
   numClients: process.env.EMULATE ? parseInt(process.env.EMULATE) : 1,
   moduleURL: import.meta.url,

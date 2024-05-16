@@ -11,13 +11,31 @@ _Tutorial_: [https://soundworks.dev/tutorials/getting-started.html](https://soun
 ### Application generator
 
 ```sh
-npx @soundworks/create@latest
+npx @soundworks/create@latest [app_name]
 ```
 
 ### Wizard in existing applications
 
 ```sh
 npx soundworks
+```
+
+## Available Commands
+
+```
+Usage: wizard [options]
+
+Options:
+  -c, --create-client    create a new soundworks client
+  -p, --install-plugins  install / uninstall soundworks plugins
+  -l, --install-libs     install / uninstall related libs
+  -f, --find-doc         find documentation about plugins and related libs
+  -i, --config-infos     get config informations about you application
+  -C, --create-env       create a new environment config file
+  -b, --extend-build     extend the build settings (babel, webpack) of your project
+  -e, --eject-launcher   eject the launcher and default views from `@soundworks/helpers`
+  -d, --check-deps       check and update your dependencies
+  -h, --help             display help for command
 ```
 
 ## Notes
@@ -31,7 +49,7 @@ To develop the application generator locally:
 // in `soundworks-create` directory:
 npm link
 // to create an app
-npx @soundworks/create
+npx @soundworks/create --debug
 // unlink globally
 npm unlink --global @soundworks/create
 npm ls --global
