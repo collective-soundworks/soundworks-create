@@ -18,8 +18,6 @@ const { version } = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.jso
 
 let debug = false; // will link itself at the end of the installation
 
-console.log('+++++++ COUCOU +++++++');
-
 if (process.argv[2] == '--debug' || process.argv[3] == '--debug') {
   console.log(chalk.yellow('> Run create in debug mode'));
   debug = true;
