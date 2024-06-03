@@ -1,7 +1,7 @@
 import '@soundworks/helpers/polyfills.js';
 import { Server } from '@soundworks/core/server.js';
+import loadConfig from '@soundworks/helpers/load-config.js';
 
-import { loadConfig } from '../utils/load-config.js';
 import '../utils/catch-unhandled-errors.js';
 
 // - General documentation: https://soundworks.dev/

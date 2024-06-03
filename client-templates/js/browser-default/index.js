@@ -1,6 +1,7 @@
 import '@soundworks/helpers/polyfills.js';
 import { Client } from '@soundworks/core/client.js';
 import launcher from '@soundworks/helpers/launcher.js';
+import loadConfig from '@soundworks/helpers/load-config.js';
 
 import { html, render } from 'lit';
 import '../components/sw-credits.js';
@@ -10,10 +11,6 @@ import '../components/sw-credits.js';
 // - Issue Tracker:         https://github.com/collective-soundworks/soundworks/issues
 // - Wizard & Tools:        `npx soundworks`
 
-/**
- * Grab the configuration object written by the server in the `index.html`
- */
-const config = window.SOUNDWORKS_CONFIG;
 
 /**
  * If multiple clients are emulated you might to want to share some resources
@@ -22,8 +19,9 @@ const config = window.SOUNDWORKS_CONFIG;
 
 async function main($container) {
   /**
-   * Create the soundworks client
+   * Load configuration from config files and create the soundworks client
    */
+  const config = loadConfig();
   const client = new Client(config);
 
   /**

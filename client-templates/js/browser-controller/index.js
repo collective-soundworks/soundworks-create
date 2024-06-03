@@ -1,6 +1,7 @@
 import '@soundworks/helpers/polyfills.js';
 import { Client } from '@soundworks/core/client.js';
 import launcher from '@soundworks/helpers/launcher.js';
+import loadConfig from '@soundworks/helpers/load-config.js';
 
 import { html, render } from 'lit';
 import '../components/sw-audit.js';
@@ -10,9 +11,11 @@ import '../components/sw-audit.js';
 // - Issue Tracker:         https://github.com/collective-soundworks/soundworks/issues
 // - Wizard & Tools:        `npx soundworks`
 
-const config = window.SOUNDWORKS_CONFIG;
-
 async function main($container) {
+  /**
+   * Load configuration from config files and create the soundworks client
+   */
+  const config = loadConfig();
   const client = new Client(config);
 
   launcher.register(client, {
