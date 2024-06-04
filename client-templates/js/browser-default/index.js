@@ -1,16 +1,14 @@
 import '@soundworks/helpers/polyfills.js';
 import { Client } from '@soundworks/core/client.js';
-import launcher from '@soundworks/helpers/launcher.js';
-import loadConfig from '@soundworks/helpers/load-config.js';
-
+import { loadConfig, launcher } from '@soundworks/helpers/browser.js';
 import { html, render } from 'lit';
+
 import '../components/sw-credits.js';
 
 // - General documentation: https://soundworks.dev/
 // - API documentation:     https://soundworks.dev/api
 // - Issue Tracker:         https://github.com/collective-soundworks/soundworks/issues
 // - Wizard & Tools:        `npx soundworks`
-
 
 /**
  * If multiple clients are emulated you might to want to share some resources
