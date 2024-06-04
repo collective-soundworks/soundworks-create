@@ -17,9 +17,8 @@ echo "> copy dev into app-templates"
 rm -Rf $dest
 # copy dev to dest
 cp -R $src $dest
-
-echo "  + override application.json"
-cp "app-templates/application.template.json" "${dest}/config/application.json"
+# remove .soundworks file
+rm -f "${dest}/.soundworks"
 
 # ------------------------------------------------------------
 

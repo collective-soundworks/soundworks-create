@@ -10,6 +10,7 @@ import { mkdirp } from 'mkdirp';
 import prompts from 'prompts';
 import readdir from 'recursive-readdir';
 import JSON5 from 'json5';
+import YAML from 'yaml';
 
 import { toValidPackageName, ignoreFiles, onCancel } from './lib/utils.js';
 
@@ -65,9 +66,11 @@ const templatesDir = path.join(__dirname, 'app-templates');
 // const templatesMetas = JSON.parse(fs.readFileSync(path.join(templatesDir, 'metas.json')));
 
 const options = {};
+options.createVersion = version;
 options.name = path.basename(targetWorkingDir);
 options.eslint = true;
 options.language = 'js';
+options.configFormat = 'yaml';
 
 const templateDir = path.join(templatesDir, options.language);
 const files = await readdir(templateDir, ignoreFiles);
@@ -95,11 +98,14 @@ for (let src of files) {
       fs.writeFileSync(dest, JSON.stringify(pkg, null, 2));
       break;
     }
-    case 'config/application.json': {
-      const obj = JSON5.parse(fs.readFileSync(src));
+    case 'config/application.yaml': {
+      const obj = YAML.parse(fs.readFileSync(src).toString());
+      // ovewrite
       obj.name = options.name;
+      obj.author = '';
       obj.clients = {};
-      fs.writeFileSync(dest, JSON5.stringify(obj, null, 2));
+
+      fs.writeFileSync(dest, YAML.stringify(obj));
       break;
     }
     case 'README.md': {
@@ -108,13 +114,6 @@ for (let src of files) {
       fs.writeFileSync(dest, readme);
       break;
     }
-
-    // npm has a weird behavior regarding `.gitignore` files which are
-    // automatically renamed to `.npmignore`.
-    // Note 31-10-2023: the .gitignore and .npmrc files seems to be completely
-    // removed from the package altogether (test w/ `npm pack`).
-    // So we are just re-creating them from scratch later
-
     // just copy the file without modification
     default: {
       fs.copyFileSync(src, dest);
@@ -123,8 +122,16 @@ for (let src of files) {
   }
 }
 
+// --------------------------------------------------------------------
+// npm has a weird behavior regarding `.gitignore` files which are
+// automatically renamed to `.npmignore`.
+// Note 31-10-2023: the .gitignore and .npmrc files seems to be completely
+// removed from the package altogether (test w/ `npm pack`).
+// So we are just re-creating them from scratch later
+// --------------------------------------------------------------------
+
 // create .gitignore file
-const gitignore = `\
+fs.writeFileSync(path.join(targetWorkingDir, '.gitignore'), `\
 # build files and dependencies
 /node_modules
 .build
@@ -140,19 +147,20 @@ Thumbs.db
 
 # TLS certificates
 /**/*.pem
-`;
-
-fs.writeFileSync(path.join(targetWorkingDir, '.gitignore'), gitignore);
+`);
 
 // create .npmrc file
-const npmrc = `package-lock=false`;
-
-fs.writeFileSync(path.join(targetWorkingDir, '.npmrc'), npmrc);
+fs.writeFileSync(path.join(targetWorkingDir, '.npmrc'), `\
+package-lock=false
+`);
 
 if (options.eslint === true) {
   const src = path.join(__dirname, 'build-tools', '.eslintrc');
-  const dest = path.join(targetWorkingDir, '.eslintrc');
-  fs.copyFileSync(src, dest);
+  fs.writeFileSync(path.join(targetWorkingDir, '.eslintrc'), `\
+{
+  "extends": "@ircam",
+}`
+  );
 }
 
 // write options in .soundworks file
@@ -183,7 +191,6 @@ if (debug) {
 
 // launch init wizard
 execSync(`npx soundworks --init`, execOptions);
-
 
 // recap & next steps
 console.log(chalk.yellow('> your project is ready!'));
