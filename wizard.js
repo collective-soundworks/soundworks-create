@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-import * as url from 'node:url';
 
 import chalk from 'chalk';
 import { program, Option } from 'commander';
@@ -14,8 +13,9 @@ import { configInfos } from './lib/config-infos.js';
 import { createEnv } from './lib/create-env.js';
 import { ejectLauncher } from './lib/eject-launcher.js';
 import { checkDeps } from './lib/check-deps.js';
+import { upgradeConfig } from './lib/upgrade-config.js';
 
-import { onCancel } from './lib/utils.js';
+import { onCancel, getSelfVersion } from './lib/utils.js';
 
 const tasks = {
   createClient,
@@ -26,9 +26,10 @@ const tasks = {
   createEnv,
   ejectLauncher,
   checkDeps,
+  upgradeConfig,
 };
 
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+const version = getSelfVersion();
 
 // allow to trigger specific taks from command line
 program
@@ -40,6 +41,7 @@ program
   .option('-C, --create-env', 'create a new environment config file')
   .option('-e, --eject-launcher', 'eject the launcher and default views from `@soundworks/helpers`')
   .option('-d, --check-deps', 'check and update your dependencies')
+  .option('--upgrade-config', 'upgrade config files from JSON to YAML')
   .addOption(new Option('-i, --init').hideHelp()) // launched by @soundworks/create
 ;
 
@@ -57,7 +59,6 @@ Aborting...
 
 const appInfos = JSON.parse(fs.readFileSync(path.join(process.cwd(), '.soundworks')));
 
-const { version } = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json')));
 console.log(chalk.gray(`[@soundworks/wizard#v${version}]`));
 console.log('');
 
@@ -111,6 +112,7 @@ ${chalk.grey(`- you can exit the wizard at any moment by typing Ctrl+C or by cho
           { title: 'create a new environment config file', value: 'createEnv' },
           { title: 'eject the launcher and default init views', value: 'ejectLauncher' },
           { title: 'check and update your dependencies', value: 'checkDeps' },
+          { title: 'upgrade config files from JSON to YAML', value: 'upgradeConfig' },
           { title: '→ exit', value: 'exit' },
         ],
       },

@@ -3,19 +3,20 @@
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import * as url from 'node:url';
 
 import chalk from 'chalk';
 import { mkdirp } from 'mkdirp';
 import prompts from 'prompts';
 import readdir from 'recursive-readdir';
-import JSON5 from 'json5';
 import YAML from 'yaml';
 
-import { toValidPackageName, ignoreFiles, onCancel } from './lib/utils.js';
+import {
+  getSelfVersion,
+  toValidPackageName,
+  ignoreFiles,
+} from './lib/utils.js';
 
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-const { version } = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json')));
+const version = getSelfVersion();
 
 let debug = false; // will link itself at the end of the installation
 
