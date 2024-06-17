@@ -3,6 +3,7 @@
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import chalk from 'chalk';
 import { mkdirp } from 'mkdirp';
@@ -17,6 +18,7 @@ import {
 } from './lib/utils.js';
 
 const version = getSelfVersion();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 let debug = false; // will link itself at the end of the installation
 
