@@ -5,3 +5,5 @@ node_modules
 Thumb.db
 
 *.bak
+
+tests/tmp

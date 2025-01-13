@@ -6,16 +6,16 @@ import chalk from 'chalk';
 import { program, Option } from 'commander';
 import prompts from 'prompts';
 
-import { createClient } from './lib/create-client.js';
-import { installPlugins, installLibs } from './lib/package-installer.js';
-import { findDoc } from './lib/find-doc.js';
-import { configInfos } from './lib/config-infos.js';
-import { createEnv } from './lib/create-env.js';
-import { ejectLauncher } from './lib/eject-launcher.js';
-import { checkDeps } from './lib/check-deps.js';
-import { upgradeConfig } from './lib/upgrade-config.js';
+import { createClient } from './src/create-client.js';
+import { installPlugins, installLibs } from './src/package-installer.js';
+import { findDoc } from './src/find-doc.js';
+import { configInfos } from './src/config-infos.js';
+import { createEnv } from './src/create-env.js';
+import { ejectLauncher } from './src/eject-launcher.js';
+import { checkDeps } from './src/check-deps.js';
+import { upgradeConfig } from './src/upgrade-config.js';
 
-import { onCancel, getSelfVersion } from './lib/utils.js';
+import { onCancel, getSelfVersion } from './src/lib/utils.js';
 
 const tasks = {
   createClient,

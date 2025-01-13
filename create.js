@@ -15,7 +15,7 @@ import {
   getSelfVersion,
   toValidPackageName,
   ignoreFiles,
-} from './lib/utils.js';
+} from './src/lib/utils.js';
 
 const version = getSelfVersion();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -157,15 +157,6 @@ fs.writeFileSync(path.join(targetWorkingDir, '.npmrc'), `\
 package-lock=false
 `);
 
-if (options.eslint === true) {
-  const src = path.join(__dirname, 'build-tools', '.eslintrc');
-  fs.writeFileSync(path.join(targetWorkingDir, '.eslintrc'), `\
-{
-  "extends": "@ircam",
-}`
-  );
-}
-
 // write options in .soundworks file
 fs.writeFileSync(path.join(targetWorkingDir, '.soundworks'), JSON.stringify(options, null, 2));
 
@@ -180,9 +171,16 @@ const execOptions = {
 // install itself as a dev dependency
 const devDeps = ['@soundworks/create'];
 
+// @todo - do not ask, just put it in the template
 if (options.eslint === true) {
   devDeps.push('eslint');
   devDeps.push('@ircam/eslint-config');
+
+  fs.writeFileSync(path.join(targetWorkingDir, '.eslintrc'), `\
+{
+  "extends": "@ircam",
+}`
+  );
 }
 
 // this will install other deps as well

@@ -5,6 +5,7 @@ Thumbs.db
 .editorconfig
 
 dev
+tests
 
 # these files are required for the wizard
 #
