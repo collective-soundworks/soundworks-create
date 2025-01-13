@@ -1,0 +1,6 @@
+name: test-upgrade-config
+author: ""
+clients:
+  player:
+    target: browser
+    default: true
