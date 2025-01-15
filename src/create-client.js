@@ -10,15 +10,51 @@ import {
   toValidFilename,
   copyDir,
   onCancel,
+  readProjectConfigEntry,
   readConfigFiles,
   writeConfigFile,
 } from './lib/utils.js';
+import {
+  WIZARD_DIRNAME,
+  CONFIG_DIRNAME,
+  CLIENTS_SRC_PATHNAME,
+  PROJECT_FILE_PATHNAME,
+} from './lib/filemap.js';
+import {
+  title,
+  warn,
+  info,
+  success,
+  blankLine,
+} from './lib/console.js';
 
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+export async function createClient(
+  dirname = process.cwd(),
+  configDirname = CONFIG_DIRNAME,
+  clientsSrcPathname = CLIENTS_SRC_PATHNAME,
+  promptsFixtures = null,
+) {
+  title('Create client');
 
-export async function createClient(appInfos) {
-  const templates = path.join(__dirname, '..', 'client-templates', appInfos.language);
-  const appConfig = readConfigFiles('application')[0][1];
+  if (!fs.existsSync(path.join(dirname, PROJECT_FILE_PATHNAME))) {
+    warn(`Project config file not found in "${dirname}", abort...`);
+    return;
+  }
+
+  if (promptsFixtures !== null) {
+    prompts.inject(promptsFixtures);
+  }
+
+  const language = readProjectConfigEntry(PROJECT_FILE_PATHNAME, 'language') || 'js';
+  const templates = path.join(WIZARD_DIRNAME, 'client-templates', language);
+  const someAppConfig = readConfigFiles(path.join(dirname, configDirname), 'application.{yaml,json}');
+
+  if (someAppConfig.length === 0) {
+    warn(`Application config file not found in "${configDirname}", abort...`);
+    return;
+  }
+
+  const [appConfigFilename, appConfig] = someAppConfig[0];
 
   const { name } = await prompts([
     {
@@ -31,15 +67,15 @@ export async function createClient(appInfos) {
   ], { onCancel });
 
   if (Object.keys(appConfig.clients).find(n => n === name)) {
-    console.error(chalk.red(`> client "${name}" already exists, aborting...`));
+    warn(`client "${name}" already exists, aborting...`);
     return;
   }
 
-  const { target } = await prompts([
+  const { runtime } = await prompts([
     {
       type: 'select',
-      name: 'target',
-      message: 'Which target for your client?',
+      name: 'runtime',
+      message: 'Which runtime for your client?',
       choices: [
         { value: 'browser' },
         { value: 'node' },
@@ -50,7 +86,7 @@ export async function createClient(appInfos) {
   let template = 'default';
   let isDefault = false;
 
-  if (target === 'browser') {
+  if (runtime === 'browser') {
     const response = await prompts([
       {
         type: 'select',
@@ -91,19 +127,19 @@ export async function createClient(appInfos) {
     }
   }
 
-  const destDirRelative = path.join('src', 'clients', name);
+  const destDirRelative = path.join(dirname, clientsSrcPathname, name);
 
-  console.log('');
-  console.log(`> creating client "${name}" in directory "${destDirRelative}"`);
-  console.log(`- name: ${chalk.cyan(name)}`);
-  console.log(`- target: ${chalk.cyan(target)}`);
+  blankLine();
+  info(`Creating client "${name}" in directory "${destDirRelative}"`);
+  info(`name: ${chalk.cyan(name)}`);
+  info(`runtime: ${chalk.cyan(runtime)}`);
 
-  if (target === 'browser') {
-    console.log(`- template: ${chalk.cyan(template)}`);
-    console.log(`- default: ${chalk.cyan(isDefault)}`);
+  if (runtime === 'browser') {
+    info(`template: ${chalk.cyan(template)}`);
+    info(`default: ${chalk.cyan(isDefault)}`);
   }
 
-  console.log(``);
+  blankLine();
 
   const { confirm } = await prompts([
     {
@@ -117,12 +153,12 @@ export async function createClient(appInfos) {
   ], { onCancel });
 
   if (confirm) {
-    const srcDir = path.join(templates, `${target}-${template}`);
+    const srcDir = path.join(templates, `${runtime}-${template}`);
     const destDir = path.join(process.cwd(), destDirRelative);
 
     await copyDir(srcDir, destDir);
 
-    const config = { target };
+    const config = { runtime };
 
     if (isDefault) {
       // remove previous default
@@ -137,11 +173,11 @@ export async function createClient(appInfos) {
 
     appConfig.clients[name] = config;
 
-    writeConfigFile('application', appConfig);
-    console.log(`> client ${name} created and configured`);
+    writeConfigFile(dirname, `application${path.extname(appConfigFilename)}`, appConfig);
+    success(`client ${name} created and configured`);
   } else {
-    console.error(`> aborting...`);
+    warn(`> aborting...`);
   }
 
-  console.log(``);
+  blankLine();
 }

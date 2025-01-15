@@ -61,14 +61,20 @@ const appInfos = JSON.parse(fs.readFileSync(path.join(process.cwd(), '.soundwork
 console.log(chalk.gray(`[@soundworks/wizard#v${version}]`));
 console.log('');
 
-// handle options from command line
-if (Object.keys(options).length > 0) {
+if (options.init) {
+  // init wizard, called by @soundworks/create, force some
+  await installPlugins();
+  await installLibs();
+  await createClient(appInfos);
+  // continue w/ regular wizard interface
+} else if (Object.keys(options).length > 0) {
+  // handle options from command line
   delete options.init; // this is not a task
   // execute all tasks one by one
   for (let task in options) {
     await tasks[task](appInfos);
   }
-
+  // command is processed, exit
   process.exit(0);
 }
 
@@ -80,14 +86,6 @@ console.log(`\
   - documentation: ${chalk.cyan('https://soundworks.dev')}
   - issues: ${chalk.cyan('https://github.com/collective-soundworks/soundworks/issues')}
 `);
-
-// init wizard, called by @soundworks/create, force some
-if (options.init) {
-  await installPlugins();
-  await installLibs();
-  await createClient(appInfos);
-  // continue w/ regular wizard interface
-}
 
 /* eslint-disable-next-line no-constant-condition */
 while (true) {

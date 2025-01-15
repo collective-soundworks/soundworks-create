@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// actaul location of the wizard
+// actual location of the wizard
 export const WIZARD_DIRNAME = path.join(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
 // constants of the template projects

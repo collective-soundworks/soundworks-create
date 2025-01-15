@@ -3,7 +3,7 @@
   author: 'The author',
   clients: {
     player: {
-      target: 'browser',
+      runtime: 'browser',
       default: true,
     },
   },

@@ -74,7 +74,7 @@ export function getPackage(dirname = process.cwd()) {
 }
 
 
-export function readProjectConfigEntry(projectFilePathname) {
+export function readProjectConfigEntry(projectFilePathname, key) {
   if (!fs.existsSync(projectFilePathname)) {
     return null;
   }

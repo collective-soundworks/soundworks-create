@@ -1,5 +1,5 @@
 name: test-upgrade-config
-author: ""
+author: The author
 clients:
   player:
     runtime: browser
