@@ -16,9 +16,18 @@ import {
   toValidPackageName,
   ignoreFiles,
 } from './src/lib/utils.js';
+import {
+  WIZARD_DIRNAME,
+  PROJECT_FILE_PATHNAME,
+} from './src/lib/filemap.js';
+import {
+  warn,
+  blankLine,
+  info,
+  success,
+} from './src/lib/console.js';
 
 const version = getSelfVersion();
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 let debug = false; // will link itself at the end of the installation
 
@@ -48,7 +57,7 @@ if (targetDir === '.') {
     {
       type: 'text',
       name: 'dir',
-      message: 'Where should we create your project?\n  (leave blank to use current directory)',
+      message: 'Where should we create your project? (leave blank to use current directory)',
     },
   ]);
 
@@ -57,31 +66,32 @@ if (targetDir === '.') {
   }
 }
 
-const targetWorkingDir = path.isAbsolute(targetDir) ?
-  targetDir : path.normalize(path.join(process.cwd(), targetDir));
+const targetWorkingDir = path.isAbsolute(targetDir)
+  ? targetDir
+  : path.normalize(path.join(process.cwd(), targetDir));
 
 if (fs.existsSync(targetWorkingDir) && fs.readdirSync(targetWorkingDir).length > 0) {
-  console.log(chalk.red(`> "${targetDir}" directory exists and is not empty, aborting...`));
+  warn(`"${targetDir}" directory exists and is not empty, aborting...`);
   process.exit(1);
 }
 
-const templatesDir = path.join(__dirname, 'app-templates');
+const templatesDir = path.join(WIZARD_DIRNAME, 'app-templates');
 // const templatesMetas = JSON.parse(fs.readFileSync(path.join(templatesDir, 'metas.json')));
 
-const options = {};
-options.createVersion = version;
-options.name = path.basename(targetWorkingDir);
-options.eslint = true;
-options.language = 'js';
-options.configFormat = 'yaml';
+const options = {
+  name: path.basename(targetWorkingDir),
+  createVersion: version,
+  language: 'js',
+  configFormat: 'yaml',
+};
 
 const templateDir = path.join(templatesDir, options.language);
 const files = await readdir(templateDir, ignoreFiles);
 
 await mkdirp(targetWorkingDir);
 
-console.log('');
-console.log(`> creating ${options.language} template in:`, targetWorkingDir);
+blankLine();
+info(`Scaffoding application in "${targetWorkingDir}" directory`);
 
 for (let src of files) {
   const file = path.relative(templateDir, src);
@@ -94,11 +104,13 @@ for (let src of files) {
       const pkg = JSON.parse(fs.readFileSync(src));
       pkg.name = toValidPackageName(options.name);
 
-      if (options.eslint) {
-        pkg.scripts.lint = `eslint .`;
-      }
-
       fs.writeFileSync(dest, JSON.stringify(pkg, null, 2));
+      break;
+    }
+    case 'README.md': {
+      let readme = fs.readFileSync(src).toString();
+      readme = readme.replace('# `[app-name]`', `# \`${options.name}\``);
+      fs.writeFileSync(dest, readme);
       break;
     }
     case 'config/application.yaml': {
@@ -109,12 +121,6 @@ for (let src of files) {
       obj.clients = {};
 
       fs.writeFileSync(dest, YAML.stringify(obj));
-      break;
-    }
-    case 'README.md': {
-      let readme = fs.readFileSync(src).toString();
-      readme = readme.replace('# `[app-name]`', `# \`${options.name}\``);
-      fs.writeFileSync(dest, readme);
       break;
     }
     // just copy the file without modification
@@ -132,36 +138,17 @@ for (let src of files) {
 // removed from the package altogether (test w/ `npm pack`).
 // So we are just re-creating them from scratch later
 // --------------------------------------------------------------------
-
-// create .gitignore file
-fs.writeFileSync(path.join(targetWorkingDir, '.gitignore'), `\
-# build files and dependencies
-/node_modules
-.build
-.data
-
-# ignore all environment config files
-/config/env-*
-
-# junk files
-package-lock.json
-.DS_Store
-Thumbs.db
-
-# TLS certificates
-/**/*.pem
-`);
-
-// create .npmrc file
-fs.writeFileSync(path.join(targetWorkingDir, '.npmrc'), `\
-package-lock=false
-`);
+['gitignore', 'npmignore'].forEach((filename) => {
+  const content = fs.readFileSync(path.join(WIZARD_DIRNAME, 'project-files', filename));
+  fs.writeFileSync(path.join(targetWorkingDir, `.${filename}`), content);
+});
 
 // write options in .soundworks file
-fs.writeFileSync(path.join(targetWorkingDir, '.soundworks'), JSON.stringify(options, null, 2));
+fs.writeFileSync(path.join(targetWorkingDir, PROJECT_FILE_PATHNAME), JSON.stringify(options, null, 2));
 
-console.log(`> installing dependencies`);
-console.log('');
+
+info(`Installing dependencies`);
+blankLine();
 
 const execOptions = {
   cwd: targetWorkingDir,
@@ -169,23 +156,7 @@ const execOptions = {
 };
 
 // install itself as a dev dependency
-const devDeps = ['@soundworks/create'];
-
-// @todo - do not ask, just put it in the template
-if (options.eslint === true) {
-  devDeps.push('eslint');
-  devDeps.push('@ircam/eslint-config');
-
-  fs.writeFileSync(path.join(targetWorkingDir, '.eslintrc'), `\
-{
-  "extends": "@ircam",
-}`
-  );
-}
-
-// this will install other deps as well
-execSync(`npm install --save-dev ${devDeps.join(' ')} --silent`, execOptions);
-
+execSync(`npm install --save-dev @soundworks/create --silent`, execOptions);
 if (debug) {
   execSync(`npm link @soundworks/create`, execOptions);
 }
@@ -194,25 +165,17 @@ if (debug) {
 execSync(`npx soundworks --init`, execOptions);
 
 // recap & next steps
-console.log(chalk.yellow('> your project is ready!'));
+success('Your project is ready!');
 
-console.log(`  ✔ ${options.language === 'js' ? 'JavaScript' : 'TypeScript'}`);
-
-if (options.eslint) {
-  console.log('  ✔ eslint');
-}
-
-console.log('')
-console.log(chalk.yellow('> next steps:'));
-let i = 1;
+blankLine();
+info('next steps:');
 
 const relative = path.relative(process.cwd(), targetWorkingDir);
+let i = 1;
+
 if (relative !== '') {
   console.log(`  ${i++}: ${chalk.cyan(`cd ${relative}`)}`);
 }
 
 console.log(`  ${i++}: ${chalk.cyan('git init && git add -A && git commit -m "first commit"')} (optional)`);
 console.log(`  ${i++}: ${chalk.cyan('npm run dev')}`);
-
-console.log('')
-console.log(`- to close the dev server, press ${chalk.bold(chalk.cyan('Ctrl-C'))}`);

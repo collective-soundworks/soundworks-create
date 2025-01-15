@@ -72,8 +72,8 @@ class SwCredits extends LitElement {
 
     return html`
       ${this._show ? $footer : nothing}
-      <sc-icon type="question" @release=${e => this._show = !this._show}></sc-icon>
-    `
+      <sc-icon type="question" @release=${_ => this._show = !this._show}></sc-icon>
+    `;
   }
 }
 
