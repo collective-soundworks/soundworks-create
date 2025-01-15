@@ -5,10 +5,24 @@ import prompts from 'prompts';
 
 import { plugins, libraries } from './package-database.js';
 import { getPackage, onCancel } from './lib/utils.js';
+import {
+  title,
+  subtitle,
+  success,
+  info,
+  warn,
+  blankLine,
+} from './lib/console.js';
 
 function packageInstaller(type, database) {
-  return async function(_appInfos) {
-    const { dependencies } = getPackage();
+  return async function(dirname = process.cwd(), promptsFixtures = null) {
+    title('Install ${type}');
+
+    if (promptsFixtures !== null) {
+      prompts.inject(promptsFixtures);
+    }
+
+    const { dependencies } = getPackage(dirname);
     const list = Object.keys(database);
     const installed = Object.keys(dependencies).filter(pkg => list.includes(pkg));
 
@@ -17,11 +31,11 @@ function packageInstaller(type, database) {
         type: 'multiselect',
         name: 'selected',
         message: `Select the ${type} you would like to install/uninstall`,
-        choices: list.map(plugin => {
+        choices: list.map(pkg => {
           return {
-            title: plugin,
-            value: plugin,
-            selected: installed.includes(plugin),
+            title: pkg,
+            value: pkg,
+            selected: installed.includes(pkg),
           };
         }),
         instructions: false,
@@ -29,23 +43,22 @@ function packageInstaller(type, database) {
       },
     ], { onCancel });
 
-    const toInstall = selected.filter(plugin => !installed.includes(plugin));
-    const toRemove = installed.filter(plugin => !selected.includes(plugin));
+    const toInstall = selected.filter(pkg => !installed.includes(pkg));
+    const toRemove = installed.filter(pkg => !selected.includes(pkg));
 
     if (toInstall.length === 0 && toRemove.length === 0) {
-      console.log(`${chalk.cyan('> nothing to do, skip...')} `);
-      console.log('');
+      warn('nothing to do, aborting...');
       return;
     }
 
-    console.log('');
+    blankLine();
 
     if (toInstall.length > 0) {
-      console.log(`${chalk.cyan('> installing:')} ${toInstall.join(', ')}`);
+      subtitle(`installing: ${toInstall.join(', ')}`);
     }
 
     if (toRemove.length > 0) {
-      console.log(`${chalk.cyan('> removing:')} ${toRemove.join(', ')}`);
+      subtitle(`removing: ${toRemove.join(', ')}`);
     }
 
     const { confirm } = await prompts([
@@ -60,48 +73,30 @@ function packageInstaller(type, database) {
     ], { onCancel });
 
     if (confirm) {
-      console.log('');
-
       if (toInstall.length > 0) {
         execSync(`npm install --save ${toInstall.join(' ')} --silent`, {
-          cwd: process.cwd(),
+          cwd: dirname,
           stdio: 'inherit',
         });
       }
 
       if (toRemove.length > 0) {
         execSync(`npm uninstall --save ${toRemove.join(' ')} --silent`, {
-          cwd: process.cwd(),
+          cwd: dirname,
           stdio: 'inherit',
         });
       }
 
-      console.log('');
-      console.log(`> ${type} successfully updated!`);
+      success(`${type} successfully updated:`);
 
       if (toInstall.length > 0) {
-        let msg;
-
-        if (type === 'plugins') {
-          msg = '> check the documentation to see how to register the plugins into you app, and see all their options:';
-        } else {
-          msg = '> check the documentation of the libraries you just installed:';
-        }
-
-        console.log('');
-        console.log(chalk.green(msg));
-
-        toInstall.forEach(plugin => {
-          console.log('');
-          console.log(`+ ${plugin}:`);
-          console.log(`  ${chalk.cyan(database[plugin].doc)}`);
-        });
+        toInstall.forEach(pkg => info(`${pkg}: ${chalk.cyan(database[pkg].doc)}`));
       }
     } else {
-      console.error(`> aborting...`);
+      warn(`aborting...`);
     }
 
-    console.log(``);
+    blankLine();
   };
 }
 

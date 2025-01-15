@@ -58,9 +58,9 @@ export async function copyDir(srcDir, distDir) {
   }
 }
 
-export function getPackage() {
+export function getPackage(dirname = process.cwd()) {
   // read package dependencies
-  const pathname = path.join(process.cwd(), 'package.json');
+  const pathname = path.join(dirname, 'package.json');
   let file = null;
 
   try {
