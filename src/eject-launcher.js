@@ -5,27 +5,40 @@ import chalk from 'chalk';
 import prompts from 'prompts';
 
 import { copyDir, onCancel } from './lib/utils.js';
+import {
+  CLIENTS_SRC_PATHNAME,
+  EJECT_LAUNCHER_DEFAULT_PATHNAME,
+  EJECT_LAUNCHER_SRC_PATHNAME,
+} from './lib/filemap.js';
+import {
+  title,
+  warn,
+  blankLine,
+} from './lib/console.js';
 
-export async function ejectLauncher(_appInfos) {
-  const defaultEjectPath = path.join('src', 'clients', 'helpers');
-  const { pathname } = await prompts([
+export async function ejectLauncher(
+  srcDir = EJECT_LAUNCHER_SRC_PATHNAME,
+  promptsFixtures = null,
+) {
+  if (promptsFixtures !== null) {
+    prompts.inject(promptsFixtures);
+  }
+
+  title(`Eject launcher`);
+
+  const { distDir } = await prompts([
     {
       type: 'text',
-      name: 'pathname',
-      initial: defaultEjectPath,
+      name: 'distDir',
+      initial: EJECT_LAUNCHER_DEFAULT_PATHNAME,
       message: 'In which directory would you like to eject the launcher?',
-      format: (value) => {
-        return path.normalize(value);
-      },
+      format: (value) => path.normalize(value),
     },
   ], { onCancel });
 
-  const srcDir = path.join(process.cwd(), 'node_modules', '@soundworks', 'helpers', 'browser-client');
-  const distDir = path.join(process.cwd(), pathname);
-
   if (fs.existsSync(distDir) && fs.readdirSync(distDir).length > 0) {
-    console.error(chalk.red(`> directory ${pathname} already exists and is not empty, aborting...`));
-    process.exit(0);
+    warn(`directory ${distDir} already exists and is not empty, aborting...`);
+    return;
   }
 
   const { confirm } = await prompts([
@@ -42,11 +55,11 @@ export async function ejectLauncher(_appInfos) {
   if (confirm) {
     await copyDir(srcDir, distDir);
 
-    const someClientPath = path.join(process.cwd(), 'src', 'clients', 'someclient');
+    const someClientPath = path.join(CLIENTS_SRC_PATHNAME, 'someclient');
     const relative = path.relative(someClientPath, distDir);
 
     console.log(`
-> @soundworks/helpers launcher ejected in ${pathname}
+> @soundworks/helpers launcher ejected in ${distDir}
 
 > You can now change the default initialization views.
 > To use the ejected launcher, in your clients' \`index.js\` files, replace:
@@ -57,8 +70,8 @@ ${chalk.green(`+ import launcher from '${relative}/launcher.js'`)}
 ${chalk.green(`+ import loadConfig from '${relative}/load-config.js'`)}
     `);
   } else {
-    console.error(`> aborting...`);
+    warn(`aborting...`);
   }
 
-  console.log(``);
+  blankLine(``);
 }

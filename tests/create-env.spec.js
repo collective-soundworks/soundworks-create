@@ -9,10 +9,6 @@ import { createEnv } from '../src/create-env.js';
 const fixturesDir = path.join('tests', 'generic-fixtures');
 const testDirname = path.join('tests', 'tmp');
 
-after(() => {
-  // fs.rmSync(testDirname, { force: true, recursive: true });
-});
-
 describe('# --create-env', () => {
   beforeEach(() => {
     fs.rmSync(testDirname, { force: true, recursive: true });
@@ -22,6 +18,10 @@ describe('# --create-env', () => {
     } catch (err) {
       console.log(err.message);
     }
+  });
+
+  after(() => {
+    fs.rmSync(testDirname, { force: true, recursive: true });
   });
 
   it('should fail gracefuly', async () => {

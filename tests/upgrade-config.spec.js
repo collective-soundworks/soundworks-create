@@ -15,10 +15,6 @@ import {
 const fixturesDir = path.join('tests', 'upgrade-config-fixtures');
 const testDirname = path.join('tests', 'tmp');
 
-after(() => {
-  fs.rmSync(testDirname, { force: true, recursive: true });
-});
-
 describe('# --upgrade-config', () => {
   beforeEach(() => {
     fs.rmSync(testDirname, { force: true, recursive: true });
@@ -28,6 +24,10 @@ describe('# --upgrade-config', () => {
     } catch (err) {
       console.log(err.message);
     }
+  });
+
+  after(() => {
+    fs.rmSync(testDirname, { force: true, recursive: true });
   });
 
   describe('## _upgradeCreateVersionInProjectFile', () => {

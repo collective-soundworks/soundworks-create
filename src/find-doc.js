@@ -3,19 +3,24 @@ import prompts from 'prompts';
 
 import { soundworks, plugins, libraries } from './package-database.js';
 import { getPackage, onCancel } from './lib/utils.js';
+import {
+  title,
+  blankLine
+} from './lib/console.js';
 
-export async function findDoc(_appInfos) {
+export async function findDoc(pomptsFixtures = null) {
+  if (pomptsFixtures !== null) {
+    prompts.inject(pomptsFixtures);
+  }
+
   const { dependencies } = getPackage();
-
-  console.log(chalk.yellow('# soundworks'));
-  console.log('');
 
   for (let name in soundworks) {
     console.log(`+ ${name}:`);
     console.log(`  ${chalk.cyan(soundworks[name].doc)}`);
   }
 
-  console.log('');
+  blankLine();
   // @todo - show installed only yes / no
   const { showInstalledOnly } = await prompts([
     {
@@ -38,9 +43,9 @@ export async function findDoc(_appInfos) {
     const installed = deps.filter(pkg => list.includes(pkg));
 
     if (installed.length > 0) {
-      console.log('');
+      blankLine();
       console.log(chalk.yellow(`# ${sourceName}`));
-      console.log('');
+      blankLine();
 
       if (!showInstalledOnly) {
         console.log(chalk.green('  [installed]'));
@@ -56,7 +61,7 @@ export async function findDoc(_appInfos) {
       const notInstalled = Object.keys(database).filter(pkg => !deps.includes(pkg));
 
       if (notInstalled.length > 0) {
-        console.log('');
+        blankLine();
         console.log(chalk.gray('  [not installed]'));
 
         notInstalled.forEach(pkg => {
@@ -67,5 +72,5 @@ export async function findDoc(_appInfos) {
     }
   });
 
-  console.log('');
+  blankLine();
 }

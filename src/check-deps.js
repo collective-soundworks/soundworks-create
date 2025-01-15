@@ -1,16 +1,23 @@
 import { execSync } from 'node:child_process';
 
-import chalk from 'chalk';
+import {
+  title,
+  blankLine,
+} from './lib/console.js';
 
-export async function checkDeps(_appInfos) {
-  console.log(chalk.cyan('> running `npm-check -u` (cf. https://www.npmjs.com/package/npm-check)'));
+/**
+ * Arguments are for testing purposes
+ */
+export async function checkDeps(dirname = process.cwd(), timeout = undefined) {
+  title('running `npm-check -u` (cf. https://www.npmjs.com/package/npm-check)');
   console.log('');
 
   execSync(`npm-check -u`, {
     stdio: 'inherit',
-    cwd: process.cwd(),
+    cwd: dirname,
+    timeout
   });
 
-  console.log('');
+  blankLine();
 }
 

@@ -128,7 +128,7 @@ export async function createEnv(configDirname = CONFIG_DIRNAME, promptsFixtures 
     const browserClients = [];
 
     for (let name in clients) {
-      if (clients[name].target === 'browser') {
+      if (runtimeOrTarget(clients[name]) === 'browser') {
         browserClients.push(name);
       }
     }

@@ -43,4 +43,7 @@ export const libraries = {
   '@ircam/sc-utils': {
     doc: 'https://github.com/ircam-ismm/sc-utils',
   },
+  'node-web-audio-api': {
+    doc: 'https://github.com/ircam-ismm/node-web-audio-api',
+  },
 };
