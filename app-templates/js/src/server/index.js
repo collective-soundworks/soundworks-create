@@ -18,22 +18,14 @@ console.log(`
 --------------------------------------------------------
 `);
 
-/**
- * Create the soundworks server
- */
 const server = new Server(config);
 // configure the server for usage within this application template
 server.useDefaultApplicationTemplate();
 
-/**
- * Register plugins and schemas
- */
+// Register plugins and create shared state classes
 // server.pluginManager.register('my-plugin', plugin);
 // server.stateManager.registerSchema('my-schema', definition);
 
-/**
- * Launch application (init plugins, http server, etc.)
- */
 await server.start();
 
 // and do your own stuff!
