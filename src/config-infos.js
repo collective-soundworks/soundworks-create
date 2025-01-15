@@ -1,6 +1,7 @@
 import path from 'node:path';
 
-import chalk from 'chalk';
+// @todo - share within @soundworks/helpers
+import { runtimeOrTarget } from './lib/runtime-or-target.js';
 
 import {
   title,
@@ -31,8 +32,8 @@ export async function configInfos(configDirname = CONFIG_DIRNAME) {
   info(`author: ${config.author}`);
   info(`clients:`);
 
-  for (let [name, clientConfig] of Object.entries(config.clients)) {
-    info(`${name} | runtime: ${clientConfig.runtime || clientConfig.target} ${clientConfig.default ? '(default)' : ''}`, 4);
+  for (let [name, clientDescription] of Object.entries(config.clients)) {
+    info(`${name} \t | runtime: ${runtimeOrTarget(clientDescription)} ${clientDescription.default ? '(default)' : ''}`, 4);
   }
 
   blankLine('');
@@ -57,11 +58,4 @@ export async function configInfos(configDirname = CONFIG_DIRNAME) {
     info(`To launch the application with this environment configuration, run: \`ENV=${envName} npm run dev\``);
     blankLine();
   });
-
-  // if (envFiles.length === 0) {
-  //   console.log(chalk.cyan('  No environment file found, run the following commmand to create a new one:'));
-  //   console.log(`${chalk.grey('>')} npx soundworks --create-env`);
-  // }
-
-  // console.log('');
 }

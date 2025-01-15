@@ -7,3 +7,4 @@ Thumb.db
 *.bak
 
 tests/tmp
+TODOS.md

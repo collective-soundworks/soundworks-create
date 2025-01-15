@@ -145,7 +145,7 @@ export function writeConfigFile(configDirname, filename, data) {
   switch (extname) {
     case '.json':
     case '.json5': {
-      fs.writeFileSync(pathname, JSON5.stringify(data, null, 2));
+      fs.writeFileSync(pathname, JSON.stringify(data, null, 2));
       break;
     }
     case '.yaml':

@@ -6,14 +6,42 @@ import JSON5 from 'json5';
 import prompts from 'prompts';
 
 import {
+  title,
+  subtitle,
+  success,
+  warn,
+  info,
+  blankLine,
+} from './lib/console.js';
+import {
   onCancel,
-  toValidFilename,
   readConfigFiles,
   writeConfigFile,
 } from './lib/utils.js';
+import {
+  CONFIG_DIRNAME
+} from './lib/filemap.js';
+import {
+  runtimeOrTarget
+} from './lib/runtime-or-target.js';
 
-export async function createEnv(_appInfos) {
-  const { clients } = readConfigFiles('application')[0][1];
+export async function createEnv(configDirname = CONFIG_DIRNAME, promptsFixtures = null) {
+  const someAppConfig = readConfigFiles(configDirname, 'application.{json,yaml}');
+
+  if (someAppConfig.length === 0) {
+    warn(`Application config file not found in "${configDirname}", abort...`);
+    return;
+  }
+
+  if (promptsFixtures) {
+    prompts.inject(promptsFixtures);
+  }
+
+  title(`Create envrironment configuration file:`);
+
+  const [appConfigPathname, appConfig] = someAppConfig[0];
+  const { clients } = appConfig;
+  const configFormat = path.extname(appConfigPathname);
 
   const { name, type, port, serverAddress, useHttps, subpath } = await prompts([
     {
@@ -22,7 +50,7 @@ export async function createEnv(_appInfos) {
       message: 'Name of the config',
       initial: 'default',
     },
-    {
+    { // this is useful, e.g. for plugin-filesystem
       type: 'select',
       name: 'type',
       message: 'Type:',
@@ -31,7 +59,7 @@ export async function createEnv(_appInfos) {
         {
           title: 'production',
           value: 'production',
-          description: 'use minified files, see `npm run build:production`',
+          // description: 'use minified files, see `npm run build:production`',
         },
       ],
     },
@@ -143,12 +171,12 @@ export async function createEnv(_appInfos) {
     auth,
   };
 
-  const filename = `env-${name}`;
+  const filename = `env-${name}${configFormat}`;
 
-  console.log('');
-  console.log(`> creating config file "${filename}":`);
+  blankLine();
+  info(`creating config file "${filename}":`);
   console.log(config);
-  console.log('');
+  blankLine('');
 
   const { confirm } = await prompts([
     {
@@ -162,13 +190,13 @@ export async function createEnv(_appInfos) {
   console.log('');
 
   if (confirm) {
-    writeConfigFile(filename, config);
-    console.log(chalk.green(`> config file "${filename}" successfully created`));
-    console.log(`> run \`ENV=${name} npm start\` to use this config`);
+    writeConfigFile(configDirname, filename, config);
+    success(`config file "${filename}" successfully created`);
+    info(`run \`ENV=${name} npm start\` to use this environment configuration`);
   } else {
-    console.error(`> aborting...`);
+    warn(`aborting...`);
   }
 
-  console.log('');
+  blankLine();
 }
 

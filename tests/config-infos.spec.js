@@ -14,8 +14,8 @@ describe('# --config-infos', () => {
   });
 
   ['json', 'yaml'].forEach(format => {
-    it.only('should properly display configuration informations', async () => {
-      const configDirname = path.join('tests', 'config-infos-fixtures', format);
+    it('should properly display configuration informations', async () => {
+      const configDirname = path.join('tests', 'generic-fixtures', format);
       // this is just logging
       await configInfos(configDirname);
       assert.ok('this is ok');
