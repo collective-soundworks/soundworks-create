@@ -11,12 +11,10 @@ import '../components/sw-audit.js';
 // - Wizard & Tools:        `npx soundworks`
 
 async function main($container) {
-  /**
-   * Load configuration from config files and create the soundworks client
-   */
   const config = loadConfig();
   const client = new Client(config);
 
+  // cf. https://soundworks.dev/tools/helpers.html#browserlauncher
   launcher.register(client, {
     initScreensContainer: $container,
     reloadOnVisibilityChange: false,

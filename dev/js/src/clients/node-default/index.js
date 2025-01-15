@@ -8,36 +8,21 @@ import { loadConfig, launcher } from '@soundworks/helpers/node.js';
 // - Wizard & Tools:        `npx soundworks`
 
 async function bootstrap() {
-  /**
-   * Load configuration from config files and create the soundworks client
-   */
   const config = loadConfig(process.env.ENV, import.meta.url);
   const client = new Client(config);
 
-  /**
-   * Register some soundworks plugins, you will need to install the plugins
-   * before hand (run `npx soundworks` for help)
-   */
+  // Eventually register plugins
   // client.pluginManager.register('my-plugin', plugin);
 
-  /**
-   * Register the soundworks client into the launcher
-   *
-   * Automatically restarts the process when the socket closes or when an
-   * uncaught error occurs in the program.
-   */
+  // https://soundworks.dev/tools/helpers.html#nodelauncher
   launcher.register(client);
 
-  /**
-   * Launch application
-   */
   await client.start();
 
   console.log(`Hello ${client.config.app.name}!`);
 }
 
-// The launcher allows to fork multiple clients in the same terminal window
-// by defining the `EMULATE` env process variable
+// The launcher allows to launch multiple clients in the same terminal window
 // e.g. `EMULATE=10 npm run watch thing` to run 10 clients side-by-side
 launcher.execute(bootstrap, {
   numClients: process.env.EMULATE ? parseInt(process.env.EMULATE) : 1,
