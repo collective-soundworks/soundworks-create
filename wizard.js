@@ -17,6 +17,7 @@ import { upgradeConfig } from './src/upgrade-config.js';
 
 import { onCancel, getSelfVersion } from './src/lib/utils.js';
 
+const version = getSelfVersion();
 const tasks = {
   createClient,
   installPlugins,
@@ -28,8 +29,6 @@ const tasks = {
   checkDeps,
   upgradeConfig,
 };
-
-const version = getSelfVersion();
 
 // allow to trigger specific taks from command line
 program
@@ -50,8 +49,8 @@ const options = program.opts();
 
 if (!fs.existsSync(path.join(process.cwd(), '.soundworks'))) {
   console.error(chalk.red(`\
-This project doesn't seem to be soundworks project.
-Note that \`npx soundworks\` should be run at the root of your project
+This project doesn't seem to be a soundworks project.
+Note that \`npx soundworks\` must be run at the root of your project
 Aborting...
   `));
   process.exit();
@@ -62,22 +61,8 @@ const appInfos = JSON.parse(fs.readFileSync(path.join(process.cwd(), '.soundwork
 console.log(chalk.gray(`[@soundworks/wizard#v${version}]`));
 console.log('');
 
-// init wizard, called by @soundworks/create
-if (options.init) {
-  console.log(chalk.yellow(`> soundworks init wizard`));
-  console.log('');
-
-  await installPlugins();
-  await installLibs();
-  await tasks.createClient(appInfos);
-
-  console.log(chalk.yellow(`> soundworks init wizard done`));
-  console.log('');
-
-  process.exit(0);
-
 // handle options from command line
-} else if (Object.keys(options).length > 0) {
+if (Object.keys(options).length > 0) {
   delete options.init; // this is not a task
   // execute all tasks one by one
   for (let task in options) {
@@ -85,44 +70,51 @@ if (options.init) {
   }
 
   process.exit(0);
+}
 
 // no options given from command line, launch interactive mode
-} else {
-  console.log(`\
-${chalk.yellow(`> welcome to the soundworks wizard`)}
-${chalk.grey(`- you can exit the wizard at any moment by typing Ctrl+C or by choosing the "exit" option`)}
+console.log(`\
+  ${chalk.yellow(`> welcome to the soundworks wizard`)}
+  ${chalk.grey(`- you can exit the wizard at any moment by typing Ctrl+C or by choosing the "exit" option`)}
 
-- documentation: ${chalk.cyan('https://soundworks.dev')}
-- issues: ${chalk.cyan('https://github.com/collective-soundworks/soundworks/issues')}
-  `);
+  - documentation: ${chalk.cyan('https://soundworks.dev')}
+  - issues: ${chalk.cyan('https://github.com/collective-soundworks/soundworks/issues')}
+`);
 
-  /* eslint-disable-next-line no-constant-condition */
-  while (true) {
-    const { task } = await prompts([
-      {
-        type: 'select',
-        name: 'task',
-        message: 'What do you want to do?',
-        choices: [
-          { title: 'create a new soundworks client', value: 'createClient' },
-          { title: 'install / uninstall soundworks plugins', value: 'installPlugins' },
-          { title: 'install / uninstall related libs', value: 'installLibs' },
-          { title: 'find documentation about plugins and libs', value: 'findDoc' },
-          { title: 'get config informations about you application', value: 'configInfos' },
-          { title: 'create a new environment config file', value: 'createEnv' },
-          { title: 'eject the launcher and default init views', value: 'ejectLauncher' },
-          { title: 'check and update your dependencies', value: 'checkDeps' },
-          { title: 'upgrade config files from JSON to YAML', value: 'upgradeConfig' },
-          { title: '→ exit', value: 'exit' },
-        ],
-      },
-    ], { onCancel });
+// init wizard, called by @soundworks/create, force some
+if (options.init) {
+  await installPlugins();
+  await installLibs();
+  await createClient(appInfos);
+  // continue w/ regular wizard interface
+}
 
-    if (task === 'exit') {
-      process.exit(0);
-    }
+/* eslint-disable-next-line no-constant-condition */
+while (true) {
+  const { task } = await prompts([
+    {
+      type: 'select',
+      name: 'task',
+      message: 'What do you want to do?',
+      choices: [
+        { title: 'create a new soundworks client', value: 'createClient' },
+        { title: 'install / uninstall soundworks plugins', value: 'installPlugins' },
+        { title: 'install / uninstall related libs', value: 'installLibs' },
+        { title: 'find documentation about plugins and libs', value: 'findDoc' },
+        { title: 'get config informations about you application', value: 'configInfos' },
+        { title: 'create a new environment config file', value: 'createEnv' },
+        { title: 'eject the launcher and default init views', value: 'ejectLauncher' },
+        { title: 'check and update your dependencies', value: 'checkDeps' },
+        { title: 'upgrade config files from JSON to YAML', value: 'upgradeConfig' },
+        { title: '→ exit', value: 'exit' },
+      ],
+    },
+  ], { onCancel });
 
-    console.log('');
-    await tasks[task](appInfos);
+  if (task === 'exit') {
+    process.exit(0);
   }
+
+  console.log('');
+  await tasks[task](appInfos);
 }
