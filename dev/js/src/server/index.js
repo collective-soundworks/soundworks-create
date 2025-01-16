@@ -1,9 +1,7 @@
 import '@soundworks/helpers/polyfills.js';
+import '@soundworks/helpers/catch-unhandled-errors.js';
 import { Server } from '@soundworks/core/server.js';
 import { loadConfig } from '@soundworks/helpers/node.js';
-
-import '../utils/catch-unhandled-errors.js';
-import { Exception } from 'sass';
 
 // - General documentation: https://soundworks.dev/
 // - API documentation:     https://soundworks.dev/api

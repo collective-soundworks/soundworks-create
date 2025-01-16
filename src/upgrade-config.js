@@ -159,6 +159,32 @@ export async function _upgradeClientDescriptionTargetToRuntime(configDirname) {
 }
 
 /**
+ * Change ServerEnvConfig#subpath to ServerEnvConfig#baseUrl in env-*.yaml
+ * @param {string} configDirname
+ *
+ * - introduced in  @soundworks/create v1.0.0-beta.0
+ * - require @soundworks/core >= v4.0.0-beta.0
+ */
+export async function _upgradeServerEnvConfigSubpathToBaseUrl(configDirname) {
+  if (!fs.existsSync(configDirname) || !fs.statSync(configDirname).isDirectory()) {
+    throw new Error(`Cannot execute "_upgradeServerEnvConfigSubpathToBaseUrl", configDirname is not a directory`);
+  }
+
+  title('Update `ServerEnvConfig#subpath` to `ServerEnvConfig#baseUrl` in env-*.yaml');
+
+  const result = readConfigFiles(configDirname, 'env-*.yaml');
+  result.forEach(([pathname, env]) => {
+    if ('subpath' in env) {
+      env.baseUrl = env.subpath;
+      delete env.subpath;
+      console.log(env);
+      writeConfigFile(configDirname, path.basename(pathname), env);
+      success(`Successfully updated "${pathname}" file`);
+    }
+  });
+}
+
+/**
  * Interactive entry point
  */
 export async function upgradeConfig() {
@@ -174,8 +200,6 @@ export async function upgradeConfig() {
   // check @soundworks/core version in package.json
   const pkg = JSON.parse(fs.readFileSync('package.json').toString());
   const coreVersion = pkg.dependencies['@soundworks/core'];
-
-  const applyUpgradeClientDescriptionTargetToRuntime = compareVersions(coreVersion, '4.0.0-alpha.29', '>');
 
   const { confirm } = await prompts([
     {
@@ -195,8 +219,9 @@ export async function upgradeConfig() {
     await _overrideLoadConfig(LOAD_CONFIG_PATHNAME);
     await _upgradeCreateVersionInProjectFile(PROJECT_FILE_PATHNAME);
 
-    if (applyUpgradeClientDescriptionTargetToRuntime) {
+    if (compareVersions(coreVersion, '4.0.0-alpha.29', '>')) {
       _upgradeClientDescriptionTargetToRuntime(CONFIG_DIRNAME);
+      _upgradeServerEnvConfigSubpathToBaseUrl(CONFiG_DIRNAME);
     }
   }
 

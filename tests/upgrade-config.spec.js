@@ -10,6 +10,7 @@ import {
   _ensureDefaultEnvConfigFile,
   _overrideLoadConfig,
   _upgradeClientDescriptionTargetToRuntime,
+  _upgradeServerEnvConfigSubpathToBaseUrl,
 } from '../src/upgrade-config.js';
 
 const fixturesDir = path.join('tests', 'upgrade-config-fixtures');
@@ -178,7 +179,7 @@ describe('# --upgrade-config', () => {
   });
 
   describe('## _upgradeClientDescriptionTargetToRuntime', () => {
-    it('should replace ClientDescription#target to ClientDescription#runtime in application.yaml file', async () => {
+    it('should rename `ClientDescription#target` to `ClientDescription#runtime` in application.yaml file', async () => {
       console.log('+ Prepare fixtures');
 
       const src = path.join(fixturesDir, 'target-to-runtime', 'application.yaml');
@@ -202,6 +203,36 @@ describe('# --upgrade-config', () => {
           },
         },
       }
+
+      const result = YAML.parse(fs.readFileSync(dest).toString());
+      assert.deepEqual(result, expectedApp);
+    });
+  });
+
+  describe('## _upgradeServerEnvConfigSubpathToBaseUrl', () => {
+    it('should rename `ServerEnvConfig#subpath` to `ServerEnvConfig#baseUrl` in env-*.yaml file', async () => {
+      console.log('+ Prepare fixtures');
+
+      const src = path.join(fixturesDir, 'subpath-to-baseurl', 'env-default.yaml');
+      const dest = path.join(testDirname, 'env-default.yaml');
+      fs.copyFileSync(src, dest);
+
+      try {
+        await _upgradeServerEnvConfigSubpathToBaseUrl(testDirname);
+      } catch (err) {
+        console.log(err);
+        assert.fail(err.message);
+      }
+
+      const expectedApp = {
+        type: 'development',
+        port: 8000,
+        serverAddress: '',
+        useHttps: false,
+        httpsInfos: { cert: null, key: null },
+        auth: { clients: [], login: '', password: '' },
+        baseUrl: ''
+      };
 
       const result = YAML.parse(fs.readFileSync(dest).toString());
       assert.deepEqual(result, expectedApp);
