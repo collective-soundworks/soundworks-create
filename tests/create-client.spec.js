@@ -76,10 +76,8 @@ describe('# --create-env', () => {
       assert.deepEqual(appConfig, appConfigExpected);
       assert.isTrue(fs.existsSync(testDirname, 'test', 'index.js'));
     });
-  });
 
-  ['json', 'yaml'].forEach(format => {
-    it.only(`should properly create a node client - ${format} config`, async () => {
+    it(`should properly create a node client - ${format} config`, async () => {
       console.log('Prepare fixtures');
 
       const appConfigSrc = path.join(fixturesDir, format, `application.${format}`);
