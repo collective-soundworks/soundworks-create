@@ -1,8 +1,4 @@
-import fs from 'node:fs';
 import path from 'node:path';
-
-import chalk from 'chalk';
-import JSON5 from 'json5';
 import prompts from 'prompts';
 
 import {
@@ -37,13 +33,13 @@ export async function createEnv(configDirname = CONFIG_DIRNAME, promptsFixtures 
     prompts.inject(promptsFixtures);
   }
 
-  title(`Create envrironment configuration file:`);
+  title(`Create environment configuration file:`);
 
   const [appConfigPathname, appConfig] = someAppConfig[0];
   const { clients } = appConfig;
   const configFormat = path.extname(appConfigPathname);
 
-  const { name, type, port, serverAddress, useHttps, subpath } = await prompts([
+  const { name, type, port, serverAddress, useHttps, baseUrl } = await prompts([
     {
       type: 'text',
       name: 'name',
@@ -82,8 +78,8 @@ export async function createEnv(configDirname = CONFIG_DIRNAME, promptsFixtures 
     },
     {
       type: 'text',
-      name: 'subpath',
-      message: 'Subpath (if the application live behind a proxy server, leave empty for most cases):',
+      name: 'baseUrl',
+      message: 'baseUrl (if the application live behind a proxy server, leave empty for most cases):',
     },
   ], { onCancel });
 
@@ -164,7 +160,7 @@ export async function createEnv(configDirname = CONFIG_DIRNAME, promptsFixtures 
   const config = {
     type,
     port: parseInt(port),
-    subpath: subpath.trim(),
+    baseUrl: baseUrl.trim(),
     serverAddress: serverAddress.trim(),
     useHttps,
     httpsInfos,

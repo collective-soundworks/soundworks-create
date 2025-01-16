@@ -24,7 +24,7 @@ describe('# --create-env', () => {
     fs.rmSync(testDirname, { force: true, recursive: true });
   });
 
-  it('should fail gracefuly', async () => {
+  it('should fail gracefully', async () => {
     const configDirname = path.join('tests', 'do-not-exists');
     // this is just logging
     await createEnv(configDirname);
@@ -32,7 +32,7 @@ describe('# --create-env', () => {
   });
 
   ['json', 'yaml'].forEach(format => {
-    it('should properly display configuration informations', async () => {
+    it('should properly display configuration information', async () => {
       console.log('Prepare fixtures');
 
       const appConfigSrc = path.join(fixturesDir, format, `application.${format}`);
@@ -54,10 +54,10 @@ describe('# --create-env', () => {
       const expected = {
         type: 'production',
         port: 8000,
-        subpath: '',
         serverAddress: '127.0.0.1',
         useHttps: false,
         httpsInfos: { cert: null, key: null },
+        baseUrl: '',
         auth: { clients: [], login: '', password: '' }
       };
 
