@@ -45,12 +45,11 @@ Options:
 To develop the application generator locally:
 
 ```sh
-// link globally
-// in `soundworks-create` directory:
+// link globally in `soundworks-create` directory:
 sudo npm link
-// to create an app
+// create an app with --debug flag
 npx @soundworks/create --debug
-// unlink globally
+// later, unlink globally
 sudo npm unlink --global @soundworks/create
 npm ls --global
 ```

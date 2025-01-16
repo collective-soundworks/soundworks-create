@@ -56,8 +56,6 @@ Aborting...
   process.exit();
 }
 
-const appInfos = JSON.parse(fs.readFileSync(path.join(process.cwd(), '.soundworks')));
-
 console.log(chalk.gray(`[@soundworks/wizard#v${version}]`));
 console.log('');
 
@@ -65,14 +63,14 @@ if (options.init) {
   // init wizard, called by @soundworks/create, force some
   await installPlugins();
   await installLibs();
-  await createClient(appInfos);
+  await createClient();
   // continue w/ regular wizard interface
 } else if (Object.keys(options).length > 0) {
   // handle options from command line
   delete options.init; // this is not a task
   // execute all tasks one by one
   for (let task in options) {
-    await tasks[task](appInfos);
+    await tasks[task]();
   }
   // command is processed, exit
   process.exit(0);
@@ -114,5 +112,5 @@ while (true) {
   }
 
   console.log('');
-  await tasks[task](appInfos);
+  await tasks[task]();
 }

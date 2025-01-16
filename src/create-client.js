@@ -127,10 +127,11 @@ export async function createClient(
     }
   }
 
-  const destDirRelative = path.join(dirname, clientsSrcPathname, name);
+  const srcDir = path.join(templates, `${runtime}-${template}`);
+  const destDir = path.join(dirname, clientsSrcPathname, name);
 
   blankLine();
-  info(`Creating client "${name}" in directory "${destDirRelative}"`);
+  info(`Creating client "${name}" in directory "${destDir}"`);
   info(`name: ${chalk.cyan(name)}`);
   info(`runtime: ${chalk.cyan(runtime)}`);
 
@@ -153,9 +154,6 @@ export async function createClient(
   ], { onCancel });
 
   if (confirm) {
-    const srcDir = path.join(templates, `${runtime}-${template}`);
-    const destDir = path.join(process.cwd(), destDirRelative);
-
     await copyDir(srcDir, destDir);
 
     const config = { runtime };
@@ -172,8 +170,9 @@ export async function createClient(
     }
 
     appConfig.clients[name] = config;
+    console.log(appConfig);
 
-    writeConfigFile(dirname, `application${path.extname(appConfigFilename)}`, appConfig);
+    writeConfigFile(path.join(dirname, configDirname), `application${path.extname(appConfigFilename)}`, appConfig);
     success(`client ${name} created and configured`);
   } else {
     warn(`> aborting...`);

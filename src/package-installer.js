@@ -16,7 +16,7 @@ import {
 
 function packageInstaller(type, database) {
   return async function(dirname = process.cwd(), promptsFixtures = null) {
-    title('Install ${type}');
+    title(`Install ${type}`);
 
     if (promptsFixtures !== null) {
       prompts.inject(promptsFixtures);
@@ -48,6 +48,7 @@ function packageInstaller(type, database) {
 
     if (toInstall.length === 0 && toRemove.length === 0) {
       warn('nothing to do, aborting...');
+      blankLine();
       return;
     }
 
