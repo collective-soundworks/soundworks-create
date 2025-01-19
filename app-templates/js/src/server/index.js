@@ -1,9 +1,7 @@
 import '@soundworks/helpers/polyfills.js';
+import '@soundworks/helpers/catch-unhandled-errors.js';
 import { Server } from '@soundworks/core/server.js';
-import { loadConfig } from '@soundworks/helpers/node.js';
-
-import '../utils/catch-unhandled-errors.js';
-import { Exception } from 'sass';
+import { loadConfig, configureHttpRouter } from '@soundworks/helpers/server.js';
 
 // - General documentation: https://soundworks.dev/
 // - API documentation:     https://soundworks.dev/api
@@ -20,12 +18,11 @@ console.log(`
 `);
 
 const server = new Server(config);
-// configure the server for usage within this application template
-server.useDefaultApplicationTemplate();
+configureHttpRouter(server);
 
 // Register plugins and create shared state classes
 // server.pluginManager.register('my-plugin', plugin);
-// server.stateManager.registerSchema('my-schema', definition);
+// server.stateManager.defineClass('my-class', description);
 
 await server.start();
 
