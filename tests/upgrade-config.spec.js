@@ -119,8 +119,8 @@ describe('# --upgrade-config', () => {
         });
 
         try {
-          await _upgradeFromJsonToYaml(testDirname, testProjectPathname);
           await _ensureDefaultEnvConfigFile(testDirname);
+          await _upgradeFromJsonToYaml(testDirname, testProjectPathname);
         } catch (err) {
           console.log(err);
           assert.fail(err.message);

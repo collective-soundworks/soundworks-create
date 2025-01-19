@@ -42,6 +42,31 @@ export async function _upgradeCreateVersionInProjectFile(projectFilePathname) {
 }
 
 /**
+ * Ensure default config file `env-default.yaml` exists.
+ * @param {string} configDirname
+ *
+ * - introduced in @soundworks/create v1.0.0-beta.0
+ */
+export async function _ensureDefaultEnvConfigFile(configDirname) {
+  if (!fs.existsSync(configDirname) || !fs.statSync(configDirname).isDirectory()) {
+    throw new Error(`Cannot execute "_ensureDefaultEnvConfigFile", configDirname is not a directory`);
+  }
+
+  title('Ensure config file "env-default.json" exists');
+
+  const destPathname = path.join(configDirname, 'env-default.json');
+
+  if (fs.existsSync(destPathname)) {
+    info('Default config file found, skip');
+    return;
+  } else {
+    const srcPathname = path.join(WIZARD_DIRNAME, 'src', 'templates', 'env-default.json');
+    fs.copyFileSync(srcPathname, destPathname);
+    success(`Successfully created default config file: "${destPathname}"`);
+  }
+}
+
+/**
  * Upgrade all config files from JSON to YAML
  * @param {string} configDirname
  * @param {string} projectFilePathname
@@ -50,11 +75,11 @@ export async function _upgradeCreateVersionInProjectFile(projectFilePathname) {
  */
 export async function _upgradeFromJsonToYaml(configDirname, projectFilePathname) {
   if (!fs.existsSync(configDirname) || !fs.statSync(configDirname).isDirectory()) {
-    throw new Error(`Cannot execute "upgradeFromJsonToYaml", configDirname is not a directory`);
+    throw new Error(`Cannot execute "_upgradeFromJsonToYaml", configDirname is not a directory`);
   }
 
   if (typeof projectFilePathname !== 'string') {
-    throw new Error(`Cannot execute "upgradeFromJsonToYaml", projectFilePathname is not a valid pathname`);
+    throw new Error(`Cannot execute "_upgradeFromJsonToYaml", projectFilePathname is not a valid pathname`);
   }
 
   title('Upgrading config files from JSON to YAML format');
@@ -83,31 +108,6 @@ export async function _upgradeFromJsonToYaml(configDirname, projectFilePathname)
 }
 
 /**
- * Ensure default config file `env-default.yaml` exists.
- * @param {string} configDirname
- *
- * - introduced in @soundworks/create v1.0.0-beta.0
- */
-export async function _ensureDefaultEnvConfigFile(configDirname) {
-  if (!fs.existsSync(configDirname) || !fs.statSync(configDirname).isDirectory()) {
-    throw new Error(`Cannot execute "upgradeFromJsonToYaml", configDirname is not a directory`);
-  }
-
-  title('Ensure config file "env-default.yaml" exists');
-
-  const destPathname = path.join(configDirname, 'env-default.yaml');
-
-  if (fs.existsSync(destPathname)) {
-    info('Default config file found, skip');
-    return;
-  } else {
-    const srcPathname = path.join(WIZARD_DIRNAME, 'src', 'templates', 'env-default.yaml');
-    fs.copyFileSync(srcPathname, destPathname);
-    success(`Successfully created default config file: "${destPathname}"`);
-  }
-}
-
-/**
  * Override `src/lib/load-config.js` to use the function provided by the @soundworks/helpers
  * @param {string} loadConfigPathname
  *
@@ -127,7 +127,7 @@ export async function _overrideLoadConfig(loadConfigPathname) {
     const srcPathname = path.join(WIZARD_DIRNAME, 'src', 'templates', 'load-config.js');
     fs.renameSync(loadConfigPathname, `${loadConfigPathname}.bak`);
     fs.copyFileSync(srcPathname, loadConfigPathname);
-    success(`Successfully overriden load config file: "${loadConfigPathname}"`);
+    success(`Successfully overridden load config file: "${loadConfigPathname}"`);
   }
 }
 
@@ -190,7 +190,7 @@ export async function _upgradeServerEnvConfigSubpathToBaseUrl(configDirname) {
 export async function upgradeConfig() {
   const configFiles = readConfigFiles(CONFIG_DIRNAME, '{application,env-*}.{yaml,json}')
 
-  title('The following files might be overriden by the update:');
+  title('The following files might be overridden by the update:');
   blankLine();
   info(PROJECT_FILE_PATHNAME);
   configFiles.forEach(([pathname, _]) => info(pathname));
@@ -212,10 +212,10 @@ export async function upgradeConfig() {
     },
   ], { onCancel });
 
-  // upgratde config files
+  // upgrade config files
   if (confirm) {
-    await _upgradeFromJsonToYaml(CONFIG_DIRNAME, PROJECT_FILE_PATHNAME);
     await _ensureDefaultEnvConfigFile(CONFIG_DIRNAME);
+    await _upgradeFromJsonToYaml(CONFIG_DIRNAME, PROJECT_FILE_PATHNAME);
     await _overrideLoadConfig(LOAD_CONFIG_PATHNAME);
     await _upgradeCreateVersionInProjectFile(PROJECT_FILE_PATHNAME);
 
