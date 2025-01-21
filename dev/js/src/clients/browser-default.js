@@ -33,7 +33,7 @@ async function main($container) {
   renderApp();
 }
 
-// The launcher enables instanciation of multiple clients in the same page
+// The launcher allows to launch multiple clients in the same browser window
 // e.g. `http://127.0.0.1:8000?emulate=10` to run 10 clients side-by-side
 launcher.execute(main, {
   numClients: parseInt(new URLSearchParams(window.location.search).get('emulate')) || 1,

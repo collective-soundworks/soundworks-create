@@ -27,7 +27,7 @@ describe('# --create-env', () => {
     fs.rmSync(testDirname, { force: true, recursive: true });
   });
 
-  it('should fail gracefuly', async () => {
+  it('should fail gracefully', async () => {
     // const configDirname = path.join('tests', 'do-not-exists');
     // this is just logging
     await createClient(testDirname);
@@ -74,7 +74,7 @@ describe('# --create-env', () => {
       const appConfig = format === 'json' ? JSON.parse(appConfigStr) : YAML.parse(appConfigStr);
 
       assert.deepEqual(appConfig, appConfigExpected);
-      assert.isTrue(fs.existsSync(testDirname, 'test', 'index.js'));
+      assert.isTrue(fs.existsSync(path.join(testDirname, 'test.js')));
     });
 
     it(`should properly create a node client - ${format} config`, async () => {
@@ -114,7 +114,7 @@ describe('# --create-env', () => {
       const appConfig = format === 'json' ? JSON.parse(appConfigStr) : YAML.parse(appConfigStr);
 
       assert.deepEqual(appConfig, appConfigExpected);
-      assert.isTrue(fs.existsSync(testDirname, 'test', 'index.js'));
+      assert.isTrue(fs.existsSync(path.join(testDirname, 'test.js')));
     });
   });
 });

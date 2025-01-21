@@ -1,10 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import * as url from 'node:url';
 
 import chalk from 'chalk';
 import prompts from 'prompts';
-import JSON5 from 'json5';
 
 import {
   toValidFilename,
@@ -46,7 +44,7 @@ export async function createClient(
   }
 
   const language = readProjectConfigEntry(PROJECT_FILE_PATHNAME, 'language') || 'js';
-  const templates = path.join(WIZARD_DIRNAME, 'client-templates', language);
+  const clientTemplates = path.join(WIZARD_DIRNAME, 'client-templates', language);
   const someAppConfig = readConfigFiles(path.join(dirname, configDirname), 'application.{yaml,json}');
 
   if (someAppConfig.length === 0) {
@@ -68,6 +66,14 @@ export async function createClient(
 
   if (Object.keys(appConfig.clients).find(n => n === name)) {
     warn(`client "${name}" already exists, aborting...`);
+    return;
+  }
+
+  const destFilename = path.join(dirname, clientsSrcPathname, `${name}.js`);
+  const relDestFilename = path.relative(dirname, destFilename);
+
+  if (fs.existsSync(destFilename)) {
+    warn(`file "${relDestFilename}" already exists, aborting...`);
     return;
   }
 
@@ -127,11 +133,10 @@ export async function createClient(
     }
   }
 
-  const srcDir = path.join(templates, `${runtime}-${template}`);
-  const destDir = path.join(dirname, clientsSrcPathname, name);
+  const srcFilename = path.join(clientTemplates, `${runtime}-${template}.js`);
 
   blankLine();
-  info(`Creating client "${name}" in directory "${destDir}"`);
+  info(`Creating client "${name}" in file "${relDestFilename}"`);
   info(`name: ${chalk.cyan(name)}`);
   info(`runtime: ${chalk.cyan(runtime)}`);
 
@@ -154,7 +159,7 @@ export async function createClient(
   ], { onCancel });
 
   if (confirm) {
-    await copyDir(srcDir, destDir);
+    fs.copyFileSync(srcFilename, destFilename);
 
     const config = { runtime };
 
@@ -170,7 +175,6 @@ export async function createClient(
     }
 
     appConfig.clients[name] = config;
-    console.log(appConfig);
 
     writeConfigFile(path.join(dirname, configDirname), `application${path.extname(appConfigFilename)}`, appConfig);
     success(`client ${name} created and configured`);

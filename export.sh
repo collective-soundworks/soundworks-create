@@ -5,13 +5,13 @@
 src="dev/js"
 dest="app-templates/js"
 
-echo "> cleaning dev application"
+echo "# cleaning dev application"
 rm -Rf "${src}/node_modules"
 rm -Rf "${src}/.build"
 
 # ------------------------------------------------------------
 
-echo "> copy dev into app-templates"
+echo "# copy dev into app-templates"
 
 # clean dest
 rm -Rf $dest
@@ -22,21 +22,21 @@ rm -f "${dest}/.soundworks"
 
 # ------------------------------------------------------------
 
-echo "> move clients to client-templates/js"
+echo "# move clients to client-templates/js"
 
 rm -Rf "client-templates/js"
 mkdir -p client-templates/js
 
-client="browser-controller"
-echo "  + ${client}"
-mv "${dest}/src/clients/${client}" "client-templates/js/${client}"
+templates=(
+  "browser-controller"
+  "browser-default"
+  "node-default"
+)
 
-client="browser-default"
-echo "  + ${client}"
-mv "${dest}/src/clients/${client}" "client-templates/js/${client}"
-
-client="node-default"
-echo "  + ${client}"
-mv "${dest}/src/clients/${client}" "client-templates/js/${client}"
+for template in "${templates[@]}"
+do
+  echo "  + ${template}"
+  mv "${dest}/src/clients/${template}.js" "client-templates/js/${template}.js"
+done
 
 # ------------------------------------------------------------
