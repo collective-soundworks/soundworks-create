@@ -159,6 +159,7 @@ export async function createClient(
   ], { onCancel });
 
   if (confirm) {
+    fs.mkdirSync(path.dirname(destFilename), { recursive: true });
     fs.copyFileSync(srcFilename, destFilename);
 
     const config = { runtime };

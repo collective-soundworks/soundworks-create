@@ -3,10 +3,8 @@
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import chalk from 'chalk';
-import { mkdirp } from 'mkdirp';
 import prompts from 'prompts';
 import readdir from 'recursive-readdir';
 import YAML from 'yaml';
@@ -88,7 +86,7 @@ const options = {
 const templateDir = path.join(templatesDir, options.language);
 const files = await readdir(templateDir, ignoreFiles);
 
-await mkdirp(targetWorkingDir);
+fs.mkdirSync(targetWorkingDir, { recursive: true });
 
 blankLine();
 info(`Scaffoding application in "${targetWorkingDir}" directory`);
@@ -97,7 +95,7 @@ for (let src of files) {
   const file = path.relative(templateDir, src);
   const dest = path.join(targetWorkingDir, file);
 
-  await mkdirp(path.dirname(dest));
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
 
   switch (file) {
     case 'package.json': {

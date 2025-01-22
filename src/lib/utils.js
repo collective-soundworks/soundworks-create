@@ -1,12 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import * as url from 'node:url';
 
 import chalk from 'chalk';
 import filenamify from 'filenamify';
 import { globSync } from 'glob';
 import JSON5 from 'json5';
-import { mkdirp } from 'mkdirp';
 import readdir from 'recursive-readdir';
 import YAML from 'yaml';
 
@@ -47,13 +45,13 @@ export function toValidFilename(input, ext = null) {
 export async function copyDir(srcDir, distDir) {
   const files = await readdir(srcDir, ignoreFiles);
 
-  await mkdirp(distDir);
+  fs.mkdirSync(distDir, { recursive: true });
 
   for (let src of files) {
     const file = path.relative(srcDir, src);
     const dest = path.join(distDir, file);
 
-    await mkdirp(path.dirname(dest));
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
     fs.copyFileSync(src, dest);
   }
 }
