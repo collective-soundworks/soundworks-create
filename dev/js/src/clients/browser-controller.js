@@ -38,6 +38,6 @@ async function main($container) {
 }
 
 launcher.execute(main, {
-  numClients: parseInt(new URLSearchParams(window.location.search).get('emulate')) || 1,
+  numClients: parseInt(new URLSearchParams(window.location.search).get('emulate') || '') || 1,
   width: '50%',
 });
