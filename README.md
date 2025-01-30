@@ -30,7 +30,7 @@ Options:
   -p, --install-plugins  install / uninstall soundworks plugins
   -l, --install-libs     install / uninstall related libs
   -f, --find-doc         find documentation about plugins and related libs
-  -i, --config-infos     get config informations about you application
+  -i, --config-infos     get config information about you application
   -C, --create-env       create a new environment config file
   -b, --extend-build     extend the build settings (babel, webpack) of your project
   -e, --eject-launcher   eject the launcher and default views from `@soundworks/helpers`

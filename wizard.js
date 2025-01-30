@@ -30,13 +30,13 @@ const tasks = {
   upgradeConfig,
 };
 
-// allow to trigger specific taks from command line
+// allow to trigger specific task from command line
 program
   .option('-c, --create-client', 'create a new soundworks client')
   .option('-p, --install-plugins', 'install / uninstall soundworks plugins')
   .option('-l, --install-libs', 'install / uninstall related libs')
   .option('-f, --find-doc', 'find documentation about plugins and related libs')
-  .option('-i, --config-infos', 'get config informations about you application')
+  .option('-i, --config-infos', 'get config information about you application')
   .option('-C, --create-env', 'create a new environment config file')
   .option('-e, --eject-launcher', 'eject the launcher and default views from `@soundworks/helpers`')
   .option('-d, --check-deps', 'check and update your dependencies')
@@ -97,7 +97,7 @@ while (true) {
         { title: 'install / uninstall soundworks plugins', value: 'installPlugins' },
         { title: 'install / uninstall related libs', value: 'installLibs' },
         { title: 'find documentation about plugins and libs', value: 'findDoc' },
-        { title: 'get config informations about you application', value: 'configInfos' },
+        { title: 'get config information about you application', value: 'configInfos' },
         { title: 'create a new environment config file', value: 'createEnv' },
         { title: 'eject the launcher and default init views', value: 'ejectLauncher' },
         { title: 'check and update your dependencies', value: 'checkDeps' },
