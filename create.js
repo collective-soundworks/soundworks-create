@@ -89,7 +89,7 @@ const files = await readdir(templateDir, ignoreFiles);
 fs.mkdirSync(targetWorkingDir, { recursive: true });
 
 blankLine();
-info(`Scaffoding application in "${targetWorkingDir}" directory`);
+info(`Scaffolding application in "${targetWorkingDir}" directory`);
 
 for (let src of files) {
   const file = path.relative(templateDir, src);

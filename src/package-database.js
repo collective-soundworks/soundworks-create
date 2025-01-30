@@ -11,14 +11,17 @@ export const plugins = {
   '@soundworks/plugin-platform-init': {
     doc: 'https://soundworks.dev/plugins/platform-init.html',
   },
-  '@soundworks/plugin-checkin': {
-    doc: 'https://soundworks.dev/plugins/checkin.html',
+  '@soundworks/plugin-sync': {
+    doc: 'https://soundworks.dev/plugins/sync.html',
   },
   '@soundworks/plugin-filesystem': {
     doc: 'https://soundworks.dev/plugins/filesystem.html',
   },
-  '@soundworks/plugin-sync': {
-    doc: 'https://soundworks.dev/plugins/sync.html',
+  '@soundworks/plugin-scripting': {
+    doc: 'https://soundworks.dev/plugins/scripting.html',
+  },
+  '@soundworks/plugin-checkin': {
+    doc: 'https://soundworks.dev/plugins/checkin.html',
   },
   '@soundworks/plugin-position': {
     doc: 'https://soundworks.dev/plugins/position.html',
@@ -26,11 +29,6 @@ export const plugins = {
   '@soundworks/plugin-logger': {
     doc: 'https://soundworks.dev/plugins/logger.html',
   },
-
-  // review before exposing here
-  // '@soundworks/plugin-scripting': {
-  //   doc: 'https://soundworks.dev/plugins/scripting.html',
-  // },
 };
 
 export const libraries = {
