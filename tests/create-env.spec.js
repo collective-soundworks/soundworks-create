@@ -58,7 +58,7 @@ describe('# --create-env', () => {
         useHttps: false,
         httpsInfos: { cert: null, key: null },
         baseUrl: '',
-        auth: { clients: [], login: '', password: '' }
+        auth: { clients: [], login: '', password: '' },
       };
 
       const content = fs.readFileSync(path.join(testDirname, `env-test.${format}`)).toString();

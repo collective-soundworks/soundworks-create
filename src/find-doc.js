@@ -4,13 +4,12 @@ import prompts from 'prompts';
 import { soundworks, plugins, libraries } from './package-database.js';
 import { getPackage, onCancel } from './lib/utils.js';
 import {
-  title,
-  blankLine
+  blankLine,
 } from './lib/console.js';
 
-export async function findDoc(pomptsFixtures = null) {
-  if (pomptsFixtures !== null) {
-    prompts.inject(pomptsFixtures);
+export async function findDoc(promptsFixtures = null) {
+  if (promptsFixtures !== null) {
+    prompts.inject(promptsFixtures);
   }
 
   const { dependencies } = getPackage();

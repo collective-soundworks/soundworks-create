@@ -13,7 +13,7 @@
   },
   "scripts": {
     "lint": "eslint",
-    "preversion": ". export.sh && git add -A && git commit --allow-empty -m 'updated templates'",
+    "preversion": "npm run lint && npm run test && . export.sh && git add -A && git commit --allow-empty -m 'updated templates'",
     "test": "mocha tests/*.spec.js",
     "test:only": "mocha"
   },
@@ -41,9 +41,9 @@
     "yaml": "^2.4.3"
   },
   "devDependencies": {
-    "@ircam/eslint-config": "^1.3.0",
+    "@ircam/eslint-config": "^2.0.1",
     "chai": "^5.1.2",
-    "eslint": "^8.53.0",
+    "eslint": "^9.19.0",
     "mocha": "^10.8.2"
   }
 }

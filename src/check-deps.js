@@ -15,7 +15,7 @@ export async function checkDeps(dirname = process.cwd(), timeout = undefined) {
   execSync(`npm-check -u`, {
     stdio: 'inherit',
     cwd: dirname,
-    timeout
+    timeout,
   });
 
   blankLine();

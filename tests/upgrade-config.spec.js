@@ -76,7 +76,7 @@ describe('# --upgrade-config', () => {
           default: true,
         },
       },
-    }
+    };
 
     const cases = {
       'from-json': {
@@ -173,7 +173,7 @@ describe('# --upgrade-config', () => {
       assert.isTrue(
         fs.readFileSync(loadConfigPathname)
           .toString()
-          .includes(`import { loadConfig as helpersLoadConfig } from '@soundworks/helpers/node.js';`)
+          .includes(`import { loadConfig as helpersLoadConfig } from '@soundworks/helpers/node.js';`),
       );
     });
   });
@@ -202,7 +202,7 @@ describe('# --upgrade-config', () => {
             default: true,
           },
         },
-      }
+      };
 
       const result = YAML.parse(fs.readFileSync(dest).toString());
       assert.deepEqual(result, expectedApp);
@@ -231,7 +231,7 @@ describe('# --upgrade-config', () => {
         useHttps: false,
         httpsInfos: { cert: null, key: null },
         auth: { clients: [], login: '', password: '' },
-        baseUrl: ''
+        baseUrl: '',
       };
 
       const result = YAML.parse(fs.readFileSync(dest).toString());

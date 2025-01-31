@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { assert } from 'chai';
 import {
-  configInfos
+  configInfos,
 } from '../src/config-infos.js';
 
 

@@ -6,7 +6,6 @@ import prompts from 'prompts';
 
 import {
   toValidFilename,
-  copyDir,
   onCancel,
   readProjectConfigEntry,
   readConfigFiles,

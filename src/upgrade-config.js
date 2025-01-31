@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import prompts from 'prompts';
 
-import { compareVersions } from 'compare-versions'
+import { compareVersions } from 'compare-versions';
 
 import {
   title,
@@ -146,7 +146,7 @@ export async function _upgradeClientDescriptionTargetToRuntime(configDirname) {
   title('Update `ClientDescription#target` to `ClientDescription#runtime` in application.yaml');
 
   const result = readConfigFiles(configDirname, 'application.yaml');
-  const [pathname, config] = result[0];
+  const [_, config] = result[0];
 
   for (let name in config.clients) {
     const client = config.clients[name];
@@ -188,7 +188,7 @@ export async function _upgradeServerEnvConfigSubpathToBaseUrl(configDirname) {
  * Interactive entry point
  */
 export async function upgradeConfig() {
-  const configFiles = readConfigFiles(CONFIG_DIRNAME, '{application,env-*}.{yaml,json}')
+  const configFiles = readConfigFiles(CONFIG_DIRNAME, '{application,env-*}.{yaml,json}');
 
   title('The following files might be overridden by the update:');
   blankLine();
@@ -221,7 +221,7 @@ export async function upgradeConfig() {
 
     if (compareVersions(coreVersion, '4.0.0-alpha.29', '>')) {
       _upgradeClientDescriptionTargetToRuntime(CONFIG_DIRNAME);
-      _upgradeServerEnvConfigSubpathToBaseUrl(CONFiG_DIRNAME);
+      _upgradeServerEnvConfigSubpathToBaseUrl(CONFIG_DIRNAME);
     }
   }
 

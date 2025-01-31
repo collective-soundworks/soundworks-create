@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import {
-  checkDeps
+  checkDeps,
 } from '../src/check-deps.js';
 
 describe('# --check-deps', () => {
@@ -10,7 +10,7 @@ describe('# --check-deps', () => {
 
     try {
       await checkDeps(dirname, timeout);
-    } catch (err) {
+    } catch {
       // timeout error
       assert.ok('this is ok');
     }

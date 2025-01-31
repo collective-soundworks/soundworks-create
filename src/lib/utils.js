@@ -12,7 +12,7 @@ export const ignoreFiles = ['.DS_Store', 'Thumbs.db'];
 export const onCancel = () => process.exit();
 
 import {
-  WIZARD_DIRNAME
+  WIZARD_DIRNAME,
 } from './filemap.js';
 
 export function getSelfVersion() {
@@ -63,7 +63,7 @@ export function getPackage(dirname = process.cwd()) {
 
   try {
     file = fs.readFileSync(pathname);
-  } catch(err) {
+  } catch {
     console.log(chalk.red(`- No package.json file found, make sure to be at the root directory of your project`));
     console.log('');
   }
@@ -81,7 +81,7 @@ export function readProjectConfigEntry(projectFilePathname, key) {
 
   try {
     projectConfig = JSON.parse(fs.readFileSync(projectFilePathname));
-  } catch (err) {
+  } catch {
     throw new Error('Cannot read project config file: Invalid JSON file');
   }
 
@@ -94,7 +94,7 @@ export function writeProjectConfigEntry(projectFilePathname, key, value) {
   if (fs.existsSync(projectFilePathname)) {
     try {
       projectConfig = JSON.parse(fs.readFileSync(projectFilePathname));
-    } catch (err) {
+    } catch {
       throw new Error('Cannot read project config file: Invalid JSON file');
     }
   }

@@ -3,7 +3,6 @@ import prompts from 'prompts';
 
 import {
   title,
-  subtitle,
   success,
   warn,
   info,
@@ -15,10 +14,10 @@ import {
   writeConfigFile,
 } from './lib/utils.js';
 import {
-  CONFIG_DIRNAME
+  CONFIG_DIRNAME,
 } from './lib/filemap.js';
 import {
-  runtimeOrTarget
+  runtimeOrTarget,
 } from './lib/runtime-or-target.js';
 
 export async function createEnv(configDirname = CONFIG_DIRNAME, promptsFixtures = null) {

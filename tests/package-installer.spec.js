@@ -1,6 +1,5 @@
 import path from 'node:path';
 import fs from 'node:fs';
-import { execSync } from 'node:child_process';
 import { assert } from 'chai';
 
 import {

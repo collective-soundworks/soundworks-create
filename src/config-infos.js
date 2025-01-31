@@ -12,7 +12,7 @@ import {
   blankLine,
 } from './lib/console.js';
 import {
-  readConfigFiles
+  readConfigFiles,
 } from './lib/utils.js';
 import { CONFIG_DIRNAME } from './lib/filemap.js';
 
@@ -50,7 +50,7 @@ export async function configInfos(configDirname = CONFIG_DIRNAME) {
 
   envFiles.forEach(([pathname, config]) => {
     let envName = path.basename(pathname, path.extname(pathname));
-    envName = envName.replace(/^env\-/, '');
+    envName = envName.replace(/^env-/, '');
 
     subtitle(pathname);
     console.log(config);

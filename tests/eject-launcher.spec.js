@@ -4,7 +4,7 @@ import { execSync } from 'node:child_process';
 import { assert } from 'chai';
 
 import {
-  ejectLauncher
+  ejectLauncher,
 } from '../src/eject-launcher.js';
 
 describe('# --eject-launcher', () => {
@@ -18,12 +18,12 @@ describe('# --eject-launcher', () => {
     fs.mkdirSync(tmpDir, { recursive: true });
     fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify({
       name: 'test-eject-launcher',
-    }))
+    }));
     execSync('npm install @soundworks/helpers', { cwd: tmpDir, stdio: 'inherit' });
   });
 
   afterEach(() => {
-    console.log('Clean fixtures')
+    console.log('Clean fixtures');
     fs.rmSync(tmpDir, { force: true, recursive: true });
   });
 

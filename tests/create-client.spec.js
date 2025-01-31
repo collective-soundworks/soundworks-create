@@ -57,17 +57,17 @@ describe('# --create-env', () => {
       await createClient(testDirname, '.', '.', promptFixtures);
 
       const appConfigExpected = {
-        "name": "test-upgrade-config",
-        "author": "The author",
-        "clients": {
-          "player": {
-            "runtime": "browser"
+        'name': 'test-upgrade-config',
+        'author': 'The author',
+        'clients': {
+          'player': {
+            'runtime': 'browser',
           },
-          "test": {
-            "runtime": "browser",
-            "default": true
-          }
-        }
+          'test': {
+            'runtime': 'browser',
+            'default': true,
+          },
+        },
       };
 
       const appConfigStr = fs.readFileSync(appConfigDst).toString();
@@ -97,17 +97,17 @@ describe('# --create-env', () => {
       await createClient(testDirname, '.', '.', promptFixtures);
 
       const appConfigExpected = {
-        "name": "test-upgrade-config",
-        "author": "The author",
-        "clients": {
-          "player": {
-            "runtime": "browser",
-            "default": true
+        'name': 'test-upgrade-config',
+        'author': 'The author',
+        'clients': {
+          'player': {
+            'runtime': 'browser',
+            'default': true,
           },
-          "test": {
-            "runtime": "node",
-          }
-        }
+          'test': {
+            'runtime': 'node',
+          },
+        },
       };
 
       const appConfigStr = fs.readFileSync(appConfigDst).toString();
