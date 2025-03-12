@@ -3,8 +3,9 @@
 .build
 .data
 
-# ignore all environment config files
+# ignore all environment config files except default
 /config/env-*
+!/config/env-default.yaml
 
 # junk files
 package-lock.json
