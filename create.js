@@ -136,7 +136,7 @@ for (let src of files) {
 // removed from the package altogether (test w/ `npm pack`).
 // So we are just re-creating them from scratch later
 // --------------------------------------------------------------------
-['gitignore', 'npmignore'].forEach((filename) => {
+['gitignore', 'npmrc'].forEach((filename) => {
   const content = fs.readFileSync(path.join(WIZARD_DIRNAME, 'project-files', filename));
   fs.writeFileSync(path.join(targetWorkingDir, `.${filename}`), content);
 });
