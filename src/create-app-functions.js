@@ -10,10 +10,8 @@ import {
   ignoreFiles,
 } from './lib/utils.js';
 import {
-  WIZARD_DIRNAME
+  WIZARD_DIRNAME,
 } from './lib/filemap.js';
-
-
 
 export async function getTargetWorkingDir() {
   let targetDir;
