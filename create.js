@@ -52,6 +52,9 @@ const language = 'js';
 const template = 'js';
 const configFormat = 'yaml';
 
+// const templateDirectoryList
+// await chooseTemplate(templateDirectoryList);
+
 const templateDirList = path.join(WIZARD_DIRNAME, 'app-templates');
 const templateDir = path.join(templateDirList, template);
 

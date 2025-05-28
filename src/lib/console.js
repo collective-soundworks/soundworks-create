@@ -28,7 +28,6 @@ export function blankLine() {
 
 export function header() {
   const version = getSelfVersion();
-
   const promptHeader = `\
 ${chalk.gray(`[@soundworks/create#v${version}]`)}
 
