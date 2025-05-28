@@ -20,6 +20,22 @@ export function getSelfVersion() {
   return version;
 }
 
+export function getSelfPackageName() {
+  const { name } = JSON.parse(fs.readFileSync(path.join(WIZARD_DIRNAME, 'package.json')));
+  return name;
+}
+
+export function isDebug() {
+  let debug = false;
+
+  if (process.argv[2] == '--debug' || process.argv[3] == '--debug') {
+    console.log(chalk.yellow('> Run create in debug mode'));
+    debug = true;
+  }
+
+  return debug;
+}
+
 // to valid npm package name
 export function toValidPackageName(name) {
   return name

@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import { getSelfVersion } from './utils.js';
 // console
 export function title(msg) {
   console.log(chalk.cyan(`# ${msg}`));
@@ -23,4 +24,19 @@ export function info(msg, indent = 0) {
 
 export function blankLine() {
   console.log('');
+}
+
+export function header() {
+  const version = getSelfVersion();
+
+  const promptHeader = `\
+  ${chalk.gray(`[@soundworks/create#v${version}]`)}
+
+  ${chalk.yellow('> welcome to soundworks')}
+
+  - documentation: ${chalk.cyan('https://soundworks.dev')}
+  - issues: ${chalk.cyan('https://github.com/collective-soundworks/soundworks/issues')}
+  `;
+
+  console.log(promptHeader);
 }
