@@ -3,7 +3,7 @@ import { execSync } from 'node:child_process';
 import chalk from 'chalk';
 import prompts from 'prompts';
 
-import { plugins, libraries } from './package-database.js';
+import { readDatabase } from './package-database.js';
 import { getPackage, onCancel } from './lib/utils.js';
 import {
   title,
@@ -101,5 +101,5 @@ function packageInstaller(type, database) {
   };
 }
 
-export const installPlugins = packageInstaller('plugins', plugins);
-export const installLibs = packageInstaller('libraries', libraries);
+export const installPlugins = packageInstaller('plugins', readDatabase('plugins'));
+export const installLibs = packageInstaller('libraries', readDatabase('libraries'));

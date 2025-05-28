@@ -85,7 +85,6 @@ console.log(`\
   - issues: ${chalk.cyan('https://github.com/collective-soundworks/soundworks/issues')}
 `);
 
- 
 while (true) {
   const { task } = await prompts([
     {

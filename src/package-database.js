@@ -1,4 +1,4 @@
-export const soundworks = {
+const generalDocumentation = {
   'soundworks general documentation': {
     doc: 'https://soundworks.dev',
   },
@@ -7,7 +7,7 @@ export const soundworks = {
   },
 };
 
-export const plugins = {
+const plugins = {
   '@soundworks/plugin-platform-init': {
     doc: 'https://soundworks.dev/plugins/platform-init.html',
   },
@@ -31,7 +31,7 @@ export const plugins = {
   },
 };
 
-export const libraries = {
+const libraries = {
   '@ircam/sc-components': {
     doc: 'https://ircam-ismm.github.io/sc-components/',
   },
@@ -45,3 +45,21 @@ export const libraries = {
     doc: 'https://github.com/ircam-ismm/node-web-audio-api',
   },
 };
+
+const database = {
+  generalDocumentation,
+  plugins,
+  libraries,
+};
+
+export function writeDatabase(type, values, override = false) {
+  if (override === false) {
+    database[type] = Object.assign(database[type], values);
+  } else {
+    database[type] = values;
+  }
+}
+
+export function readDatabase(type) {
+  return database[type];
+}

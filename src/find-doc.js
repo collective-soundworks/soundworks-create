@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import prompts from 'prompts';
 
-import { soundworks, plugins, libraries } from './package-database.js';
+import { readDatabase } from './package-database.js';
 import { getPackage, onCancel } from './lib/utils.js';
 import {
   blankLine,
@@ -12,11 +12,15 @@ export async function findDoc(promptsFixtures = null) {
     prompts.inject(promptsFixtures);
   }
 
+  const generalDocumentation = readDatabase('generalDocumentation');
+  const plugins = readDatabase('plugins');
+  const libraries = readDatabase('libraries');
+
   const { dependencies } = getPackage();
 
-  for (let name in soundworks) {
+  for (let name in generalDocumentation) {
     console.log(`+ ${name}:`);
-    console.log(`  ${chalk.cyan(soundworks[name].doc)}`);
+    console.log(`  ${chalk.cyan(generalDocumentation[name].doc)}`);
   }
 
   blankLine();
@@ -25,7 +29,7 @@ export async function findDoc(promptsFixtures = null) {
     {
       type: 'toggle',
       name: 'showInstalledOnly',
-      message: 'Which soundworks related packages do you want to check?',
+      message: 'Which packages do you want to check?',
       initial: true,
       active: 'installed ones',
       inactive: 'all ones',
