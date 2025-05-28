@@ -30,12 +30,12 @@ export function header() {
   const version = getSelfVersion();
 
   const promptHeader = `\
-  ${chalk.gray(`[@soundworks/create#v${version}]`)}
+${chalk.gray(`[@soundworks/create#v${version}]`)}
 
-  ${chalk.yellow('> welcome to soundworks')}
+${chalk.yellow('> welcome to soundworks')}
 
-  - documentation: ${chalk.cyan('https://soundworks.dev')}
-  - issues: ${chalk.cyan('https://github.com/collective-soundworks/soundworks/issues')}
+- documentation: ${chalk.cyan('https://soundworks.dev')}
+- issues: ${chalk.cyan('https://github.com/collective-soundworks/soundworks/issues')}
   `;
 
   console.log(promptHeader);
