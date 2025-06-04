@@ -4,8 +4,5 @@ node_modules
 
 .DS_Store
 Thumb.db
-
 *.bak
-
 tests/tmp
-TODOS.md

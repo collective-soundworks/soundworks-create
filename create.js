@@ -47,14 +47,11 @@ if (fs.existsSync(targetWorkingDir) && fs.readdirSync(targetWorkingDir).length >
   process.exit(1);
 }
 
+// @todo - make this part more open and dynamic
 const appName = path.basename(targetWorkingDir);
 const language = 'js';
 const template = 'js';
 const configFormat = 'yaml';
-
-// const templateDirectoryList
-// await chooseTemplate(templateDirectoryList);
-
 const templateDirList = path.join(WIZARD_DIRNAME, 'app-templates');
 const templateDir = path.join(templateDirList, template);
 
@@ -69,7 +66,6 @@ writeProjectConfigEntry(projectConfigPathname, 'createVersion', version);
 writeProjectConfigEntry(projectConfigPathname, 'language', language);
 writeProjectConfigEntry(projectConfigPathname, 'template', template);
 writeProjectConfigEntry(projectConfigPathname, 'configFormat', configFormat);
-
 
 info(`Installing dependencies`);
 blankLine();

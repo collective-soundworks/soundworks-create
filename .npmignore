@@ -3,6 +3,7 @@ Thumbs.db
 
 .eslintrc
 .editorconfig
+TODOS.md
 
 dev
 tests
