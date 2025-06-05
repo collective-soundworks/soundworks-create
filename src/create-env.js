@@ -12,6 +12,7 @@ import {
   onCancel,
   readConfigFiles,
   writeConfigFile,
+  getFormattedConfig,
 } from './lib/utils.js';
 import {
   CONFIG_DIRNAME,
@@ -170,7 +171,9 @@ export async function createEnv(configDirname = CONFIG_DIRNAME, promptsFixtures 
 
   blankLine();
   info(`creating config file "${filename}":`);
-  console.log(config);
+  console.log('```');
+  console.log(getFormattedConfig(filename, config));
+  console.log('```');
   blankLine('');
 
   const { confirm } = await prompts([

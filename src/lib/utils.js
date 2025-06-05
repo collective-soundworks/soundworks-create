@@ -152,25 +152,25 @@ export function readConfigFiles(configDirname, glob) {
   return results;
 }
 
-export function writeConfigFile(configDirname, filename, data) {
+export function getFormattedConfig(filename, data) {
   const extname = path.extname(filename).toLowerCase();
-  const pathname = path.join(configDirname, filename);
 
   switch (extname) {
     case '.json':
-    case '.json5': {
-      fs.writeFileSync(pathname, JSON.stringify(data, null, 2));
-      break;
-    }
+    case '.json5':
+      return JSON.stringify(data, null, 2);
     case '.yaml':
-    case '.yml': {
-      fs.writeFileSync(pathname, YAML.stringify(data));
-      break;
-    }
-    default: {
-      throw new Error(`Cannot execute "writeConfigFile": Not supported config format ${extname}`);
-    }
+    case '.yml':
+      return YAML.stringify(data);
+    default:
+      throw new Error(`Cannot execute "getFormattedConfig": Not supported config format ${extname}`);
   }
+}
+
+export function writeConfigFile(configDirname, filename, data) {
+  const pathname = path.join(configDirname, filename);
+  const formatted = getFormattedConfig(filename, data);
+  fs.writeFileSync(pathname, formatted);
 }
 
 export function hasJSONConfigFile(configDirname) {
