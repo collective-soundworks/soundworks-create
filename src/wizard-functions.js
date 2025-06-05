@@ -64,7 +64,7 @@ export const tasks = [
   },
   {
     name: 'checkDeps',
-    description: 'heck and update your dependencies',
+    description: 'check and update your dependencies',
     callback: checkDeps,
     flags: '-d, --check-deps',
     launchOnInit: false,
