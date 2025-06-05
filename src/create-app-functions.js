@@ -98,17 +98,17 @@ export async function copyTemplate(appName, templateDir, targetWorkingDir, files
   });
 }
 
-export function installDependencies(targetWorkingDir, wizardPackageName, debug) {
+export function installDependencies(targetWorkingDir, packageName = '@soundworks/create', debug = false) {
   const execOptions = {
     cwd: targetWorkingDir,
     stdio: 'inherit',
   };
 
   // install itself as a dev dependency
-  execSync(`npm install --save-dev @soundworks/create --silent`, execOptions);
+  execSync(`npm install --save-dev ${packageName} --silent`, execOptions);
 
   if (debug) {
-    execSync(`npm link @soundworks/create`, execOptions);
+    execSync(`npm link ${packageName}`, execOptions);
   }
 }
 
