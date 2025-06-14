@@ -15,7 +15,7 @@ import {
   TEMPLATE_INFO_BASENAME,
 } from './filemap.js';
 import {
-  readDatabase
+  readDatabase,
 } from '../package-database.js';
 
 export const ignoreFiles = ['.DS_Store', 'Thumbs.db'];
@@ -208,7 +208,7 @@ export function parseTemplates() {
 
     try {
       config = JSON.parse(fs.readFileSync(templateInfosPathname));
-    } catch (err) {
+    } catch {
       console.log(`> Invalid template config file (${templateInfosPathname})`);
       continue;
     }

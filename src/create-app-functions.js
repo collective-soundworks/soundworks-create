@@ -63,9 +63,9 @@ export async function chooseTemplate() {
           title: infos.name,
           description: `${infos.description} (${infos.templatePackage}`,
           value: infos,
-        }
+        };
       }),
-    }
+    },
   ], { onCancel });
 
   return templateInfos;
