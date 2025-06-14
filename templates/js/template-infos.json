@@ -1,0 +1,24 @@
+  {
+    "name": "js",
+    "description": "Minimal JavaScript template",
+    "clients": [
+      {
+        "runtime": "browser",
+        "name": "default",
+        "description": "",
+        "pathname": "src/clients/browser-default.js"
+      },
+      {
+        "runtime": "browser",
+        "name": "controller",
+        "description": "",
+        "pathname": "src/clients/browser-controller.js"
+      },
+      {
+        "runtime": "node",
+        "name": "default",
+        "description": "",
+        "pathname": "src/clients/node-default.js"
+      }
+    ]
+  }

@@ -10,7 +10,6 @@ import {
   writeProjectConfigEntry,
 } from './src/lib/utils.js';
 import {
-  WIZARD_DIRNAME,
   PROJECT_FILE_PATHNAME,
 } from './src/lib/filemap.js';
 import {
@@ -25,21 +24,16 @@ import {
   copyTemplate,
   installDependencies,
   launchWizardInit,
+  chooseTemplate,
 } from './src/create-app-functions.js';
 
-// --------------------------------------------------------
-// prompt header
-// --------------------------------------------------------
-const version = getSelfVersion();
+header();
 // will link itself at the end of the installation if --debug is passed to the command
 const debug = isDebug();
-
-header();
 
 // --------------------------------------------------------
 // scaffolding
 // --------------------------------------------------------
-
 const targetWorkingDir = await getTargetWorkingDir();
 
 if (fs.existsSync(targetWorkingDir) && fs.readdirSync(targetWorkingDir).length > 0) {
@@ -47,33 +41,33 @@ if (fs.existsSync(targetWorkingDir) && fs.readdirSync(targetWorkingDir).length >
   process.exit(1);
 }
 
-// @todo - make this part more open and dynamic
 const appName = path.basename(targetWorkingDir);
-const language = 'js';
-const template = 'js';
-const configFormat = 'yaml';
-const templateDirList = path.join(WIZARD_DIRNAME, 'app-templates');
-const templateDir = path.join(templateDirList, template);
+const templateInfos = await chooseTemplate();
 
 blankLine();
 info(`Scaffolding application in "${targetWorkingDir}" directory`);
 
-await copyTemplate(appName, templateDir, targetWorkingDir);
+await copyTemplate(appName, templateInfos, targetWorkingDir);
 
 const projectConfigPathname = path.join(targetWorkingDir, PROJECT_FILE_PATHNAME);
 writeProjectConfigEntry(projectConfigPathname, 'name', appName);
-writeProjectConfigEntry(projectConfigPathname, 'createVersion', version);
-writeProjectConfigEntry(projectConfigPathname, 'language', language);
-writeProjectConfigEntry(projectConfigPathname, 'template', template);
-writeProjectConfigEntry(projectConfigPathname, 'configFormat', configFormat);
+writeProjectConfigEntry(projectConfigPathname, 'createVersion', getSelfVersion());
+writeProjectConfigEntry(projectConfigPathname, 'template',  templateInfos.name);
+writeProjectConfigEntry(projectConfigPathname, 'templatePackage', templateInfos.templatePackage);
+writeProjectConfigEntry(projectConfigPathname, 'configFormat', 'yaml');
 
+// --------------------------------------------------------
+// install & init
+// --------------------------------------------------------
 info(`Installing dependencies`);
 blankLine();
 
 installDependencies(targetWorkingDir, getSelfPackageName(), debug);
 launchWizardInit(targetWorkingDir, 'soundworks --init');
 
+// --------------------------------------------------------
 // recap & next steps
+// --------------------------------------------------------
 success('Your project is ready!');
 blankLine();
 info('next steps:');
