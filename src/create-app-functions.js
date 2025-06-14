@@ -8,9 +8,12 @@ import YAML from 'yaml';
 import {
   toValidPackageName,
   ignoreFiles,
+  parseTemplates,
+  onCancel,
 } from './lib/utils.js';
 import {
   WIZARD_DIRNAME,
+  TEMPLATE_INFO_BASENAME,
 } from './lib/filemap.js';
 
 export async function getTargetWorkingDir() {
@@ -28,7 +31,7 @@ export async function getTargetWorkingDir() {
         name: 'dir',
         message: 'Where should we create your project? (leave blank to use current directory)',
       },
-    ]);
+    ], { onCancel });
 
     if (result.dir) {
       targetDir = result.dir;
@@ -42,13 +45,60 @@ export async function getTargetWorkingDir() {
   return targetWorkingDir;
 }
 
-export async function copyTemplate(appName, templateDir, targetWorkingDir, filesToIgnore = ignoreFiles) {
-  const files = await readdir(templateDir, filesToIgnore);
+export async function chooseTemplate() {
+  const templatesInfos = parseTemplates();
+
+  // if only one template found, no need for prompting
+  if (templatesInfos.length === 1) {
+    return templatesInfos[0];
+  }
+
+  const { templateInfos } = await prompts([
+    {
+      type: 'select',
+      name: 'templateInfos',
+      message: 'Which template do you want to use?',
+      choices: templatesInfos.map(infos => {
+        return {
+          title: infos.name,
+          description: `${infos.description} (${infos.templatePackage}`,
+          value: infos,
+        }
+      }),
+    }
+  ], { onCancel });
+
+  return templateInfos;
+}
+
+export async function copyTemplate(appName, templateInfos, targetWorkingDir, filesToIgnore = ignoreFiles) {
+  const { templatePathname } = templateInfos;
+  const files = await readdir(templatePathname, filesToIgnore);
 
   fs.mkdirSync(targetWorkingDir, { recursive: true });
 
   for (let src of files) {
-    const file = path.relative(templateDir, src);
+    // do not copy the `template-infos.json` file
+    if (path.basename(src) === TEMPLATE_INFO_BASENAME) {
+      continue;
+    }
+    // do not copy client files
+    let isClientFile = false;
+
+    for (let clientInfos of templateInfos.clients) {
+      const rel = path.relative(path.join(templatePathname, clientInfos.pathname), src);
+
+      if (!rel.startsWith('..')) {
+        isClientFile = true;
+        break;
+      }
+    }
+
+    if (isClientFile) {
+      continue;
+    }
+
+    const file = path.relative(templatePathname, src);
     const dest = path.join(targetWorkingDir, file);
 
     fs.mkdirSync(path.dirname(dest), { recursive: true });

@@ -5,16 +5,17 @@ import chalk from 'chalk';
 import prompts from 'prompts';
 
 import {
+  copyDir,
+  getSelfPackageName,
   toValidFilename,
   onCancel,
+  parseTemplates,
   readProjectConfigEntry,
   readConfigFiles,
   writeConfigFile,
 } from './lib/utils.js';
 import {
-  WIZARD_DIRNAME,
   CONFIG_DIRNAME,
-  CLIENTS_SRC_PATHNAME,
   PROJECT_FILE_PATHNAME,
 } from './lib/filemap.js';
 import {
@@ -28,7 +29,6 @@ import {
 export async function createClient(
   dirname = process.cwd(),
   configDirname = CONFIG_DIRNAME,
-  clientsSrcPathname = CLIENTS_SRC_PATHNAME,
   promptsFixtures = null,
 ) {
   title('Create client');
@@ -42,8 +42,13 @@ export async function createClient(
     prompts.inject(promptsFixtures);
   }
 
-  const language = readProjectConfigEntry(PROJECT_FILE_PATHNAME, 'language') || 'js';
-  const clientTemplates = path.join(WIZARD_DIRNAME, 'client-templates', language);
+  const templateName = readProjectConfigEntry(PROJECT_FILE_PATHNAME, 'template') || 'js';
+  const templatePackage = readProjectConfigEntry(PROJECT_FILE_PATHNAME, 'templatePackage') || getSelfPackageName();
+  const templatesInfos = parseTemplates();
+  const currentTemplateInfos = templatesInfos.find(infos => {
+    return infos.name === templateName && infos.templatePackage === templatePackage;
+  });
+
   const someAppConfig = readConfigFiles(path.join(dirname, configDirname), 'application.{yaml,json}');
 
   if (someAppConfig.length === 0) {
@@ -68,14 +73,6 @@ export async function createClient(
     return;
   }
 
-  const destFilename = path.join(dirname, clientsSrcPathname, `${name}.js`);
-  const relDestFilename = path.relative(dirname, destFilename);
-
-  if (fs.existsSync(destFilename)) {
-    warn(`file "${relDestFilename}" already exists, aborting...`);
-    return;
-  }
-
   const { runtime } = await prompts([
     {
       type: 'select',
@@ -88,24 +85,35 @@ export async function createClient(
     },
   ], { onCancel });
 
-  let template = 'default';
+  const runtimeTemplates = currentTemplateInfos.clients.filter(client => client.runtime === runtime);
+
+  const { clientTemplateName } = await prompts([
+    {
+      type: 'select',
+      name: 'clientTemplateName',
+      message: 'Which template would you like to use?',
+      // title, description, value
+      choices: runtimeTemplates.map(template => {
+        return { value: template.name };
+      }),
+    },
+  ], { onCancel });
+
+  const clientTemplateInfos = runtimeTemplates.find(template => template.name === clientTemplateName);
+  const relDirname = path.dirname(clientTemplateInfos.pathname);
+  const extname = path.extname(clientTemplateInfos.pathname);
+  // if client template is a directory, extname is empty so we are ok
+  const destPathname = path.join(dirname, relDirname, `${name}${extname}`);
+  const relDestPathname = path.relative(dirname, destPathname);
+
+  if (fs.existsSync(destPathname)) {
+    warn(`file "${relDestPathname}" already exists, aborting...`);
+    return;
+  }
+
   let isDefault = false;
 
   if (runtime === 'browser') {
-    const response = await prompts([
-      {
-        type: 'select',
-        name: 'template',
-        message: 'Which template would you like to use?',
-        choices: [
-          { value: 'default' },
-          { value: 'controller' },
-        ],
-      },
-    ], { onCancel });
-
-    template = response.template;
-
     let hasDefault = false;
 
     for (let name in appConfig.clients) {
@@ -132,15 +140,13 @@ export async function createClient(
     }
   }
 
-  const srcFilename = path.join(clientTemplates, `${runtime}-${template}.js`);
-
   blankLine();
-  info(`Creating client "${name}" in file "${relDestFilename}"`);
+  info(`Creating client "${name}" in "${relDestPathname}"`);
   info(`name: ${chalk.cyan(name)}`);
   info(`runtime: ${chalk.cyan(runtime)}`);
+  info(`template: ${chalk.cyan(clientTemplateInfos.name)}`);
 
   if (runtime === 'browser') {
-    info(`template: ${chalk.cyan(template)}`);
     info(`default: ${chalk.cyan(isDefault)}`);
   }
 
@@ -158,8 +164,21 @@ export async function createClient(
   ], { onCancel });
 
   if (confirm) {
-    fs.mkdirSync(path.dirname(destFilename), { recursive: true });
-    fs.copyFileSync(srcFilename, destFilename);
+    const srcPathname = path.join(
+      // absolute path of the template in the filesystem
+      currentTemplateInfos.templatePathname,
+      // where the client template is located in the app template
+      clientTemplateInfos.pathname,
+    );
+
+    // make sure the parent directory exists
+    fs.mkdirSync(path.dirname(destPathname), { recursive: true });
+
+    if (fs.statSync(srcPathname).isFile()) {
+      fs.copyFileSync(srcPathname, destPathname);
+    } else {
+      await copyDir(srcPathname, destPathname);
+    }
 
     const config = { runtime };
 
