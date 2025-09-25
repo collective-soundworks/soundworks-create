@@ -61,7 +61,7 @@ export async function chooseTemplate() {
       choices: templatesInfos.map(infos => {
         return {
           title: infos.name,
-          description: `${infos.description} (${infos.templatePackage}`,
+          description: `${infos.description} (${infos.templatePackage})`,
           value: infos,
         };
       }),

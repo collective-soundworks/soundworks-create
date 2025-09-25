@@ -87,17 +87,25 @@ export async function createClient(
 
   const runtimeTemplates = currentTemplateInfos.clients.filter(client => client.runtime === runtime);
 
-  const { clientTemplateName } = await prompts([
-    {
-      type: 'select',
-      name: 'clientTemplateName',
-      message: 'Which template would you like to use?',
-      // title, description, value
-      choices: runtimeTemplates.map(template => {
-        return { value: template.name };
-      }),
-    },
-  ], { onCancel });
+  let clientTemplateName;
+
+  if (runtimeTemplates.length === 1) {
+    clientTemplateName = runtimeTemplates[0].name;
+  } else {
+    const result = await prompts([
+      {
+        type: 'select',
+        name: 'clientTemplateName',
+        message: 'Which template would you like to use?',
+        // title, description, value
+        choices: runtimeTemplates.map(template => {
+          return { value: template.name };
+        }),
+      },
+    ], { onCancel });
+
+    clientTemplateName = result.clientTemplateName;
+  }
 
   const clientTemplateInfos = runtimeTemplates.find(template => template.name === clientTemplateName);
   const relDirname = path.dirname(clientTemplateInfos.pathname);
