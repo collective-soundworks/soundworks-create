@@ -48,7 +48,7 @@ export async function copyTemplate(appName, templateDir, targetWorkingDir, files
   fs.mkdirSync(targetWorkingDir, { recursive: true });
 
   for (let src of files) {
-    const file = path.relative(templateDir, src);
+    const file = path.normalize(path.relative(templateDir, src));
     const dest = path.join(targetWorkingDir, file);
 
     fs.mkdirSync(path.dirname(dest), { recursive: true });
@@ -67,7 +67,7 @@ export async function copyTemplate(appName, templateDir, targetWorkingDir, files
         fs.writeFileSync(dest, readme);
         break;
       }
-      case 'config/application.yaml': {
+      case `config${path.sep}application.yaml`: {
         const obj = YAML.parse(fs.readFileSync(src).toString());
         // overwrite
         obj.name = appName;
