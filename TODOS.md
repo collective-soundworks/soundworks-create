@@ -7,13 +7,13 @@ templates/
     template/
       config
       src
-    infos.js
+    template-infos.js
   ts/
     template/
-    infos.js
+    template-infos.js
 ```
 
-- [ ] `infos.json`
+- [ ] `template-infos.json`
 
 ```
   {

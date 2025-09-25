@@ -1,5 +1,5 @@
 import '@soundworks/helpers/polyfills.js';
-import { Client } from '@soundworks/core/client.js';
+import { Client, type ClientConfig } from '@soundworks/core/client.js';
 import { loadConfig, launcher } from '@soundworks/helpers/node.js';
 
 // - General documentation: https://soundworks.dev/
@@ -8,7 +8,7 @@ import { loadConfig, launcher } from '@soundworks/helpers/node.js';
 // - Wizard & Tools:        `npx soundworks`
 
 async function bootstrap() {
-  const config = loadConfig(process.env.ENV, import.meta.url);
+  const config: ClientConfig = loadConfig(process.env.ENV, import.meta.url);
   const client = new Client(config);
 
   // Eventually register plugins

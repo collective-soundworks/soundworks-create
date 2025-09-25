@@ -1,19 +1,25 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+// import { isString } from '@ircam/sc-utils';
 import chalk from 'chalk';
 import filenamify from 'filenamify';
 import { globSync } from 'glob';
 import JSON5 from 'json5';
 import readdir from 'recursive-readdir';
 import YAML from 'yaml';
-
-export const ignoreFiles = ['.DS_Store', 'Thumbs.db'];
-export const onCancel = () => process.exit();
+import { packageUpSync } from 'package-up';
 
 import {
   WIZARD_DIRNAME,
+  TEMPLATE_INFO_BASENAME,
 } from './filemap.js';
+import {
+  readDatabase,
+} from '../package-database.js';
+
+export const ignoreFiles = ['.DS_Store', 'Thumbs.db'];
+export const onCancel = () => process.exit();
 
 export function getSelfVersion() {
   const { version } = JSON.parse(fs.readFileSync(path.join(WIZARD_DIRNAME, 'package.json')));
@@ -176,4 +182,56 @@ export function writeConfigFile(configDirname, filename, data) {
 export function hasJSONConfigFile(configDirname) {
   const list = globSync(`${configDirname}/{application,env-*}.json`);
   return list.length > 0;
+}
+
+export function parseTemplates() {
+  const templates = readDatabase('templates');
+  const infos = [];
+
+  for (let pathname of templates) {
+    if (!fs.statSync(pathname).isDirectory()) {
+      continue;
+    }
+
+    // find the package in which the template is living
+    const pkg = packageUpSync({ cwd: path.resolve(pathname, '..') });
+    const packageName = JSON.parse(fs.readFileSync(pkg)).name;
+
+    const templateInfosPathname = path.join(pathname, TEMPLATE_INFO_BASENAME);
+
+    if (!fs.existsSync(templateInfosPathname)) {
+      console.log('> no template config file found');
+      continue;
+    }
+
+    let config = null;
+
+    try {
+      config = JSON.parse(fs.readFileSync(templateInfosPathname));
+    } catch {
+      console.log(`> Invalid template config file (${templateInfosPathname})`);
+      continue;
+    }
+
+    if (typeof config.name !== 'string') {
+      console.log(`> Invalid template config file (${templateInfosPathname}): field "name" is not a string`);
+      continue;
+    }
+
+    if (!Array.isArray(config.clients)) {
+      console.log(`> Invalid template config file (${templateInfosPathname}): field "clients" is not an array`);
+      continue;
+    }
+
+    config.templatePackage = packageName;
+    config.templatePathname = pathname;
+
+    infos.push(config);
+  }
+
+  if (infos.length === 0) {
+    throw new Error(`No template found in directories: ${JSON.stringify(templates)}`);
+  }
+
+  return infos;
 }
