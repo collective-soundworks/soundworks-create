@@ -12,7 +12,7 @@ import {
 const fixturesDir = path.join('tests', 'generic-fixtures');
 const testDirname = path.join('tests', 'tmp');
 
-describe('# --create-env', () => {
+describe('# --create-client', () => {
   beforeEach(() => {
     fs.rmSync(testDirname, { force: true, recursive: true });
 

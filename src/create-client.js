@@ -3,6 +3,7 @@ import path from 'node:path';
 
 import chalk from 'chalk';
 import prompts from 'prompts';
+import compile from 'template-literal';
 
 import {
   toValidFilename,
@@ -68,14 +69,6 @@ export async function createClient(
     return;
   }
 
-  const destFilename = path.join(dirname, clientsSrcPathname, `${name}.js`);
-  const relDestFilename = path.relative(dirname, destFilename);
-
-  if (fs.existsSync(destFilename)) {
-    warn(`file "${relDestFilename}" already exists, aborting...`);
-    return;
-  }
-
   const { runtime } = await prompts([
     {
       type: 'select',
@@ -89,53 +82,79 @@ export async function createClient(
   ], { onCancel });
 
   let template = 'default';
-  let isDefault = false;
+  let isDefault = false; // for browser clients only
+  let rel
 
-  if (runtime === 'browser') {
-    const response = await prompts([
-      {
-        type: 'select',
-        name: 'template',
-        message: 'Which template would you like to use?',
-        choices: [
-          { value: 'default' },
-          { value: 'controller' },
-        ],
-      },
-    ], { onCancel });
-
-    template = response.template;
-
-    let hasDefault = false;
-
-    for (let name in appConfig.clients) {
-      if (appConfig.clients[name].default === true) {
-        hasDefault = true;
-      }
-    }
-
-    if (!hasDefault) {
-      isDefault = true;
-    } else {
-      const result = await prompts([
+  switch (runtime) {
+    case 'browser': {
+      const response = await prompts([
         {
-          type: 'toggle',
-          name: 'isDefault',
-          message: 'Use this client as default?',
-          initial: false,
-          active: 'yes',
-          inactive: 'no',
+          type: 'select',
+          name: 'template',
+          message: 'Which template would you like to use?',
+          choices: [
+            { value: 'default' },
+            { value: 'controller' },
+          ],
         },
       ], { onCancel });
 
-      isDefault = result.isDefault;
+      template = response.template;
+
+      let hasDefault = false;
+
+      for (let name in appConfig.clients) {
+        if (appConfig.clients[name].default === true) {
+          hasDefault = true;
+        }
+      }
+
+      if (!hasDefault) {
+        isDefault = true;
+      } else {
+        const result = await prompts([
+          {
+            type: 'toggle',
+            name: 'isDefault',
+            message: 'Use this client as default?',
+            initial: false,
+            active: 'yes',
+            inactive: 'no',
+          },
+        ], { onCancel });
+
+        isDefault = result.isDefault;
+      }
+      break;
+    }
+    case 'node': {
+      const response = await prompts([
+        {
+          type: 'select',
+          name: 'template',
+          message: 'Which template would you like to use?',
+          choices: [
+            { value: 'default' },
+            { title: 'max (`node.script`)', value: 'max' },
+          ],
+        },
+      ], { onCancel });
+      break;
     }
   }
 
-  const srcFilename = path.join(clientTemplates, `${runtime}-${template}.js`);
+  const srcPathname = path.join(clientTemplates, `${runtime}-${template}.js`);
+  const destFilename = `${name}.js`;
+  const destPathname = path.join(dirname, clientsSrcPathname, destFilename);
+  const relDestPathname = path.relative(dirname, destPathname); // for logs
+
+  if (fs.existsSync(destPathname)) {
+    warn(`file "${relDestPathname}" already exists, aborting...`);
+    return;
+  }
 
   blankLine();
-  info(`Creating client "${name}" in file "${relDestFilename}"`);
+  info(`Creating client "${name}" in file "${relDestPathname}"`);
   info(`name: ${chalk.cyan(name)}`);
   info(`runtime: ${chalk.cyan(runtime)}`);
 
@@ -158,8 +177,22 @@ export async function createClient(
   ], { onCancel });
 
   if (confirm) {
-    fs.mkdirSync(path.dirname(destFilename), { recursive: true });
-    fs.copyFileSync(srcFilename, destFilename);
+    fs.mkdirSync(path.dirname(destPathname), { recursive: true });
+
+    const content = fs.readFileSync(srcPathname, 'utf-8');
+    // sanitize existing template literal expressions
+    const sanitized = content
+      .replace(/`/gm, '\\`')
+      .replace(/\$\{/gm, '\\${');
+
+    const template = compile(sanitized);
+    const parsed = template({
+      rootDirname: dirname,
+      pathname: destPathname,
+      clientName: name,
+    });
+
+    fs.writeFileSync(destPathname, parsed);
 
     const config = { runtime };
 
