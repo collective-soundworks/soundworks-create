@@ -83,63 +83,46 @@ export async function createClient(
 
   let template = 'default';
   let isDefault = false; // for browser clients only
-  let rel
 
-  switch (runtime) {
-    case 'browser': {
-      const response = await prompts([
-        {
-          type: 'select',
-          name: 'template',
-          message: 'Which template would you like to use?',
-          choices: [
-            { value: 'default' },
-            { value: 'controller' },
-          ],
-        },
-      ], { onCancel });
+  const choices = runtime === 'browser'
+    ? [{ value: 'default' }, { value: 'controller' }]
+    : [{ value: 'default' }, { title: 'max (`node.script`)', value: 'max' }];
 
-      template = response.template;
+  const response = await prompts([
+    {
+      type: 'select',
+      name: 'template',
+      message: 'Which template would you like to use?',
+      choices: choices,
+    },
+  ], { onCancel });
 
-      let hasDefault = false;
+  template = response.template;
 
-      for (let name in appConfig.clients) {
-        if (appConfig.clients[name].default === true) {
-          hasDefault = true;
-        }
+  if (runtime === 'browser') {
+    let hasDefault = false;
+
+    for (let name in appConfig.clients) {
+      if (appConfig.clients[name].default === true) {
+        hasDefault = true;
       }
-
-      if (!hasDefault) {
-        isDefault = true;
-      } else {
-        const result = await prompts([
-          {
-            type: 'toggle',
-            name: 'isDefault',
-            message: 'Use this client as default?',
-            initial: false,
-            active: 'yes',
-            inactive: 'no',
-          },
-        ], { onCancel });
-
-        isDefault = result.isDefault;
-      }
-      break;
     }
-    case 'node': {
-      const response = await prompts([
+
+    if (!hasDefault) {
+      isDefault = true;
+    } else {
+      const result = await prompts([
         {
-          type: 'select',
-          name: 'template',
-          message: 'Which template would you like to use?',
-          choices: [
-            { value: 'default' },
-            { title: 'max (`node.script`)', value: 'max' },
-          ],
+          type: 'toggle',
+          name: 'isDefault',
+          message: 'Use this client as default?',
+          initial: false,
+          active: 'yes',
+          inactive: 'no',
         },
       ], { onCancel });
-      break;
+
+      isDefault = result.isDefault;
     }
   }
 
@@ -157,9 +140,9 @@ export async function createClient(
   info(`Creating client "${name}" in file "${relDestPathname}"`);
   info(`name: ${chalk.cyan(name)}`);
   info(`runtime: ${chalk.cyan(runtime)}`);
+  info(`template: ${chalk.cyan(template)}`);
 
   if (runtime === 'browser') {
-    info(`template: ${chalk.cyan(template)}`);
     info(`default: ${chalk.cyan(isDefault)}`);
   }
 
