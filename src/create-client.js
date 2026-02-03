@@ -191,7 +191,7 @@ export async function createClient(
     blankLine();
 
     const maxTargetDirectory = await getTargetDirectory({
-      message: 'Where should we create your Max patch?'
+      message: 'Where should we create your Max patch?',
     });
     console.log(maxTargetDirectory);
     fs.mkdirSync(maxTargetDirectory, { recursive: true });
