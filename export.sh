@@ -31,6 +31,7 @@ templates=(
   "browser-controller"
   "browser-default"
   "node-default"
+  "node-max"
 )
 
 for template in "${templates[@]}"
@@ -38,5 +39,9 @@ do
   echo "  + ${template}"
   mv "${dest}/src/clients/${template}.js" "client-templates/js/${template}.js"
 done
+
+# max host and proxy templates
+mv "${dest}/src/clients/node-max-proxy.js" "client-templates/js/node-max-proxy.js"
+mv "${dest}/src/clients/node-max-host.maxpat" "client-templates/js/node-max-host.maxpat"
 
 # ------------------------------------------------------------
