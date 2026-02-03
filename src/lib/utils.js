@@ -5,6 +5,7 @@ import chalk from 'chalk';
 import filenamify from 'filenamify';
 import { globSync } from 'glob';
 import JSON5 from 'json5';
+import prompts from 'prompts';
 import readdir from 'recursive-readdir';
 import YAML from 'yaml';
 
@@ -177,3 +178,32 @@ export function hasJSONConfigFile(configDirname) {
   const list = globSync(`${configDirname}/{application,env-*}.json`);
   return list.length > 0;
 }
+
+export async function getTargetDirectory({
+  message = 'Where should we create your project?',
+  targetDir = '.',
+} = {}) {
+  if (targetDir === '.') {
+    const result = await prompts([
+      {
+        type: 'text',
+        name: 'dir',
+        message: `${message} (leave blank to use current directory)`,
+      },
+    ]);
+
+    if (result.dir) {
+      targetDir = result.dir;
+    }
+  }
+
+  // remove leading and trailing spaces, occurs when drag n drop from Finder
+  targetDir = targetDir.trim();
+
+  const targetWorkingDir = path.isAbsolute(targetDir)
+    ? path.normalize(targetDir)
+    : path.normalize(path.join(process.cwd(), targetDir));
+
+  return targetWorkingDir;
+}
+

@@ -8,6 +8,7 @@ import {
   getSelfPackageName,
   isDebug,
   writeProjectConfigEntry,
+  getTargetDirectory,
 } from './src/lib/utils.js';
 import {
   WIZARD_DIRNAME,
@@ -21,7 +22,6 @@ import {
   success,
 } from './src/lib/console.js';
 import {
-  getTargetWorkingDir,
   copyTemplate,
   installDependencies,
   launchWizardInit,
@@ -40,7 +40,10 @@ header();
 // scaffolding
 // --------------------------------------------------------
 
-const targetWorkingDir = await getTargetWorkingDir();
+const targetWorkingDir = await getTargetDirectory({
+  message: 'Where should we create your project?',
+  targetDir: process.argv[2] && process.argv[2] !== '--debug' ? process.argv[2] : undefined,
+});
 
 if (fs.existsSync(targetWorkingDir) && fs.readdirSync(targetWorkingDir).length > 0) {
   warn(`"${targetWorkingDir}" directory exists and is not empty, aborting...`);

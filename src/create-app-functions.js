@@ -1,7 +1,6 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import { execSync } from 'node:child_process';
-import prompts from 'prompts';
 import readdir from 'recursive-readdir';
 import YAML from 'yaml';
 
@@ -12,35 +11,6 @@ import {
 import {
   WIZARD_DIRNAME,
 } from './lib/filemap.js';
-
-export async function getTargetWorkingDir() {
-  let targetDir;
-  if (process.argv[2] && process.argv[2] !== '--debug') {
-    targetDir = process.argv[2];
-  } else {
-    targetDir = '.';
-  }
-
-  if (targetDir === '.') {
-    const result = await prompts([
-      {
-        type: 'text',
-        name: 'dir',
-        message: 'Where should we create your project? (leave blank to use current directory)',
-      },
-    ]);
-
-    if (result.dir) {
-      targetDir = result.dir;
-    }
-  }
-
-  const targetWorkingDir = path.isAbsolute(targetDir)
-    ? targetDir
-    : path.normalize(path.join(process.cwd(), targetDir));
-
-  return targetWorkingDir;
-}
 
 export async function copyTemplate(appName, templateDir, targetWorkingDir, filesToIgnore = ignoreFiles) {
   const files = await readdir(templateDir, filesToIgnore);
