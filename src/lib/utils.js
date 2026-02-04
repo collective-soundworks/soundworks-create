@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import chalk from 'chalk';
+import expandTilde from 'expand-tilde';
 import filenamify from 'filenamify';
 import { globSync } from 'glob';
 import JSON5 from 'json5';
@@ -199,11 +200,12 @@ export async function getTargetDirectory({
 
   // remove leading and trailing spaces, occurs when drag n drop from Finder
   targetDir = targetDir.trim();
+  targetDir = expandTilde(targetDir);
 
-  const targetWorkingDir = path.isAbsolute(targetDir)
+  targetDir = path.isAbsolute(targetDir)
     ? path.normalize(targetDir)
     : path.normalize(path.join(process.cwd(), targetDir));
 
-  return targetWorkingDir;
+  return targetDir;
 }
 
