@@ -1,6 +1,8 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import { execSync } from 'node:child_process';
+
+import prompts from 'prompts';
 import readdir from 'recursive-readdir';
 import YAML from 'yaml';
 
@@ -16,7 +18,7 @@ import {
 } from './lib/filemap.js';
 
 export async function chooseTemplate() {
-  const templatesInfos = parseTemplates();
+  const templatesInfos = await parseTemplates();
 
   // if only one template found, no need for prompting
   if (templatesInfos.length === 1) {
@@ -41,8 +43,9 @@ export async function chooseTemplate() {
   return templateInfos;
 }
 
-export async function copyTemplate(appName, templateDir, targetWorkingDir, filesToIgnore = ignoreFiles) {
-  const files = await readdir(templateDir, filesToIgnore);
+export async function copyTemplate(appName, templateInfos, targetWorkingDir, filesToIgnore = ignoreFiles) {
+  const { templatePathname } = templateInfos;
+  const files = await readdir(templatePathname, filesToIgnore);
 
   fs.mkdirSync(targetWorkingDir, { recursive: true });
 
@@ -55,11 +58,19 @@ export async function copyTemplate(appName, templateDir, targetWorkingDir, files
     let isClientFile = false;
 
     for (let clientInfos of templateInfos.clients) {
+      // we don't check just for equality in order to support directories as well
       const rel = path.relative(path.join(templatePathname, clientInfos.pathname), src);
-
       if (!rel.startsWith('..')) {
         isClientFile = true;
         break;
+      }
+
+      // also ignore client assets
+      if (clientInfos.assets) {
+        if (src.startsWith(path.join(templatePathname, clientInfos.assets))) {
+          isClientFile = true;
+          break;
+        }
       }
     }
 

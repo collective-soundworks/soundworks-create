@@ -23,9 +23,9 @@ describe('# --create-client', () => {
     }
   });
 
-  afterEach(() => {
-    fs.rmSync(testDirname, { force: true, recursive: true });
-  });
+  // afterEach(() => {
+  //   fs.rmSync(testDirname, { force: true, recursive: true });
+  // });
 
   it('should fail gracefully', async () => {
     // this is just logging
@@ -84,15 +84,9 @@ describe('# --create-client', () => {
       fs.copyFileSync(projectConfigSrc, projectConfigDst);
 
       const promptFixtures = [
-<<<<<<< HEAD
-        'test',
-        'node',
-        'default',
-=======
         'test', // name
         'node', // runtime
         'default', // template
->>>>>>> main
         true, // confirm
       ];
 
@@ -118,5 +112,47 @@ describe('# --create-client', () => {
       assert.deepEqual(appConfig, appConfigExpected);
       assert.isTrue(fs.existsSync(path.join(testDirname, 'src', 'clients', 'test.js')));
     });
+  });
+
+  it(`should properly create a max client - yaml config`, async () => {
+    const appConfigSrc = path.join(fixturesDir, 'yaml', `application.yaml`);
+    const appConfigDst = path.join(testDirname, `application.yaml`);
+    fs.copyFileSync(appConfigSrc, appConfigDst);
+
+    const projectConfigSrc = path.join(fixturesDir, PROJECT_FILE_PATHNAME);
+    const projectConfigDst = path.join(testDirname, PROJECT_FILE_PATHNAME);
+    fs.copyFileSync(projectConfigSrc, projectConfigDst);
+
+    const promptFixtures = [
+      'test', // name
+      'node', // runtime
+      'max', // template
+      true, // confirm
+      path.join(testDirname, 'patches'), // patch and proxy path
+    ];
+
+    await createClient(testDirname, '.', promptFixtures);
+
+    const appConfigExpected = {
+      'name': 'test-upgrade-config',
+      'author': 'The author',
+      'clients': {
+        'player': {
+          'runtime': 'browser',
+          'default': true,
+        },
+        'test': {
+          'runtime': 'node',
+        },
+      },
+    };
+
+    const appConfigStr = fs.readFileSync(appConfigDst).toString();
+    const appConfig = YAML.parse(appConfigStr);
+
+    assert.deepEqual(appConfig, appConfigExpected);
+    assert.isTrue(fs.existsSync(path.join(testDirname, 'src', 'clients', 'test.js')));
+    assert.isTrue(fs.existsSync(path.join(testDirname, 'patches', 'node-test.js')));
+    assert.isTrue(fs.existsSync(path.join(testDirname, 'patches', 'node-test.maxpat')));
   });
 });

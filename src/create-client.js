@@ -6,6 +6,9 @@ import prompts from 'prompts';
 import compile from 'template-literal';
 
 import {
+  getTargetDirectory,
+} from './lib/prompts.js';
+import {
   copyDir,
   getSelfPackageName,
   toValidFilename,
@@ -14,7 +17,6 @@ import {
   readProjectConfigEntry,
   readConfigFiles,
   writeConfigFile,
-  getTargetDirectory,
 } from './lib/utils.js';
 import {
   CONFIG_DIRNAME,
@@ -46,7 +48,7 @@ export async function createClient(
 
   const templateName = readProjectConfigEntry(PROJECT_FILE_PATHNAME, 'template') || 'js';
   const templatePackage = readProjectConfigEntry(PROJECT_FILE_PATHNAME, 'templatePackage') || getSelfPackageName();
-  const templatesInfos = parseTemplates();
+  const templatesInfos = await parseTemplates();
   const currentTemplateInfos = templatesInfos.find(infos => {
     return infos.name === templateName && infos.templatePackage === templatePackage;
   });
@@ -101,7 +103,7 @@ export async function createClient(
         message: 'Which template would you like to use?',
         // title, description, value
         choices: runtimeTemplates.map(template => {
-          return { value: template.name };
+          return { value: template.name, title: template.description };
         }),
       },
     ], { onCancel });
@@ -112,6 +114,14 @@ export async function createClient(
   const clientTemplateInfos = runtimeTemplates.find(template => template.name === clientTemplateName);
   const relDirname = path.dirname(clientTemplateInfos.pathname);
   const extname = path.extname(clientTemplateInfos.pathname);
+
+  const srcPathname = path.join(
+    // absolute path of the template in the filesystem
+    currentTemplateInfos.templatePathname,
+    // where the client template is located in the template
+    clientTemplateInfos.pathname,
+  );
+
   // if client template is a directory, extname is empty so we are ok
   const destPathname = path.join(dirname, relDirname, `${name}${extname}`);
   const relDestPathname = path.relative(dirname, destPathname);
@@ -154,7 +164,7 @@ export async function createClient(
   info(`Creating client "${name}" in file "${relDestPathname}"`);
   info(`name: ${chalk.cyan(name)}`);
   info(`runtime: ${chalk.cyan(runtime)}`);
-  info(`template: ${chalk.cyan(clientTemplateInfos.name)}`);
+  info(`template: ${chalk.cyan(clientTemplateName)}`);
 
   if (runtime === 'browser') {
     info(`default: ${chalk.cyan(isDefault)}`);
@@ -174,13 +184,6 @@ export async function createClient(
   ], { onCancel });
 
   if (confirm) {
-    const srcPathname = path.join(
-      // absolute path of the template in the filesystem
-      currentTemplateInfos.templatePathname,
-      // where the client template is located in the app template
-      clientTemplateInfos.pathname,
-    );
-
     // make sure the parent directory exists
     fs.mkdirSync(path.dirname(destPathname), { recursive: true });
 
@@ -212,18 +215,20 @@ export async function createClient(
     warn(`> aborting...`);
   }
 
+  // @todo - move this a template post-hook
   // Create sample patch and proxy file for Max node.script clients.
-  if (runtime === 'node' && template === 'max') {
+  if (runtime === 'node' && clientTemplateName === 'max') {
     blankLine();
 
     const maxTargetDirectory = await getTargetDirectory({
       message: 'Where should we create your Max patch?',
     });
-    console.log(maxTargetDirectory);
+
     fs.mkdirSync(maxTargetDirectory, { recursive: true });
 
-    const samplePatchPathname = path.join(clientTemplates, `${runtime}-${template}-host.maxpat`);
-    const sampleProxyPathname = path.join(clientTemplates, `${runtime}-${template}-proxy.js`);
+    const srcDirname = path.dirname(srcPathname);
+    const samplePatchPathname = path.join(srcDirname, 'node-max-assets', `node-max-host.maxpat`);
+    const sampleProxyPathname = path.join(srcDirname, 'node-max-assets',`node-max-proxy.js`);
     const patchDestFilename = `node-${name}.maxpat`;
     const proxyDestFilename = `node-${name}.js`;
 

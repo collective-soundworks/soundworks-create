@@ -6,7 +6,7 @@ export const WIZARD_DIRNAME = path.join(path.dirname(fileURLToPath(import.meta.u
 export const TEMPLATES_DIRNAME = path.join(WIZARD_DIRNAME, 'templates');
 
 // constants of the template projects
-export const TEMPLATE_INFO_BASENAME = 'template-infos.json';
+export const TEMPLATE_INFO_BASENAME = 'template-infos.js';
 export const PROJECT_FILE_PATHNAME = '.soundworks';
 export const CONFIG_DIRNAME = 'config';
 

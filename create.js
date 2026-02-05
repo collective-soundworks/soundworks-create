@@ -4,11 +4,13 @@ import path from 'node:path';
 import chalk from 'chalk';
 
 import {
+  getTargetDirectory,
+} from './src/lib/prompts.js';
+import {
   getSelfVersion,
   getSelfPackageName,
   isDebug,
   writeProjectConfigEntry,
-  getTargetDirectory,
 } from './src/lib/utils.js';
 import {
   PROJECT_FILE_PATHNAME,
@@ -34,15 +36,11 @@ const debug = isDebug();
 // --------------------------------------------------------
 // scaffolding
 // --------------------------------------------------------
-<<<<<<< HEAD
-const targetWorkingDir = await getTargetWorkingDir();
-=======
 
 const targetWorkingDir = await getTargetDirectory({
   message: 'Where should we create your project?',
   targetDir: process.argv[2] && process.argv[2] !== '--debug' ? process.argv[2] : undefined,
 });
->>>>>>> main
 
 if (fs.existsSync(targetWorkingDir) && fs.readdirSync(targetWorkingDir).length > 0) {
   warn(`"${targetWorkingDir}" directory exists and is not empty, aborting...`);
