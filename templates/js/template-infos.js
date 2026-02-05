@@ -27,5 +27,5 @@ export default {
       pathname: 'src/clients/node-max.js',
       assets: 'src/clients/node-max-assets',
     },
-  ]
-}
+  ],
+};
