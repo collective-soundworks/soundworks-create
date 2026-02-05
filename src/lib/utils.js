@@ -3,9 +3,11 @@ import path from 'node:path';
 
 // import { isString } from '@ircam/sc-utils';
 import chalk from 'chalk';
+import expandTilde from 'expand-tilde';
 import filenamify from 'filenamify';
 import { globSync } from 'glob';
 import JSON5 from 'json5';
+import prompts from 'prompts';
 import readdir from 'recursive-readdir';
 import YAML from 'yaml';
 import { packageUpSync } from 'package-up';
@@ -235,3 +237,33 @@ export function parseTemplates() {
 
   return infos;
 }
+
+export async function getTargetDirectory({
+  message = 'Where should we create your project?',
+  targetDir = '.',
+} = {}) {
+  if (targetDir === '.') {
+    const result = await prompts([
+      {
+        type: 'text',
+        name: 'dir',
+        message: `${message} (leave blank to use current directory)`,
+      },
+    ]);
+
+    if (result.dir) {
+      targetDir = result.dir;
+    }
+  }
+
+  // remove leading and trailing spaces, occurs when drag n drop from Finder
+  targetDir = targetDir.trim();
+  targetDir = expandTilde(targetDir);
+
+  targetDir = path.isAbsolute(targetDir)
+    ? path.normalize(targetDir)
+    : path.normalize(path.join(process.cwd(), targetDir));
+
+  return targetDir;
+}
+

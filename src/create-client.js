@@ -3,6 +3,7 @@ import path from 'node:path';
 
 import chalk from 'chalk';
 import prompts from 'prompts';
+import compile from 'template-literal';
 
 import {
   copyDir,
@@ -13,6 +14,7 @@ import {
   readProjectConfigEntry,
   readConfigFiles,
   writeConfigFile,
+  getTargetDirectory,
 } from './lib/utils.js';
 import {
   CONFIG_DIRNAME,
@@ -149,7 +151,7 @@ export async function createClient(
   }
 
   blankLine();
-  info(`Creating client "${name}" in "${relDestPathname}"`);
+  info(`Creating client "${name}" in file "${relDestPathname}"`);
   info(`name: ${chalk.cyan(name)}`);
   info(`runtime: ${chalk.cyan(runtime)}`);
   info(`template: ${chalk.cyan(clientTemplateInfos.name)}`);
@@ -188,6 +190,7 @@ export async function createClient(
       await copyDir(srcPathname, destPathname);
     }
 
+    // update config file
     const config = { runtime };
 
     if (isDefault) {
@@ -207,6 +210,38 @@ export async function createClient(
     success(`client ${name} created and configured`);
   } else {
     warn(`> aborting...`);
+  }
+
+  // Create sample patch and proxy file for Max node.script clients.
+  if (runtime === 'node' && template === 'max') {
+    blankLine();
+
+    const maxTargetDirectory = await getTargetDirectory({
+      message: 'Where should we create your Max patch?',
+    });
+    console.log(maxTargetDirectory);
+    fs.mkdirSync(maxTargetDirectory, { recursive: true });
+
+    const samplePatchPathname = path.join(clientTemplates, `${runtime}-${template}-host.maxpat`);
+    const sampleProxyPathname = path.join(clientTemplates, `${runtime}-${template}-proxy.js`);
+    const patchDestFilename = `node-${name}.maxpat`;
+    const proxyDestFilename = `node-${name}.js`;
+
+    // inject proxyDestFilename into sample patch template
+    const patchTemplate = compile(fs.readFileSync(samplePatchPathname));
+    const patchContent = patchTemplate({ proxyDestFilename });
+    fs.writeFileSync(path.join(maxTargetDirectory, patchDestFilename), patchContent);
+
+    // inject "real" cwd and client file path in proxy
+    const proxyTemplate = compile(fs.readFileSync(sampleProxyPathname));
+    // relative path from max directory to application cwd
+    const relCwd = path.relative(maxTargetDirectory, dirname);
+    // relative path from max directory to "real" client file
+    const relClientPathname = path.relative(maxTargetDirectory, destPathname);
+    const proxyContent = proxyTemplate({ relCwd, relClientPathname });
+    fs.writeFileSync(path.join(maxTargetDirectory, proxyDestFilename), proxyContent);
+
+    success(`Max patch and JS proxy successfully created in "${path.relative(dirname, maxTargetDirectory)}"`);
   }
 
   blankLine();

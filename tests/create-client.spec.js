@@ -44,9 +44,9 @@ describe('# --create-client', () => {
       fs.copyFileSync(projectConfigSrc, projectConfigDst);
 
       const promptFixtures = [
-        'test',
-        'browser',
-        'default',
+        'test', // name
+        'browser', // runtime
+        'default', // template
         true, // mark as default
         true, // confirm
       ];
@@ -84,9 +84,15 @@ describe('# --create-client', () => {
       fs.copyFileSync(projectConfigSrc, projectConfigDst);
 
       const promptFixtures = [
+<<<<<<< HEAD
         'test',
         'node',
         'default',
+=======
+        'test', // name
+        'node', // runtime
+        'default', // template
+>>>>>>> main
         true, // confirm
       ];
 
