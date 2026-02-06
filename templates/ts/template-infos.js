@@ -32,7 +32,7 @@ export default {
       runtime: 'node',
       name: 'max',
       description: 'max `node.script`',
-      pathname: 'src/clients/node-max.js',
+      pathname: 'src/clients/node-max.ts',
       assets: 'src/clients/node-max-assets',
       postCreateHook: async (clientName, appDirname, srcPathname, destPathname) => {
         blankLine();

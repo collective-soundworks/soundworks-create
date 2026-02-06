@@ -113,13 +113,16 @@
                     "numinlets": 1,
                     "numoutlets": 2,
                     "outlettype": [ "", "" ],
-                    "patching_rect": [ 20.0, 137.0, 181.0, 22.0 ],
+                    "patching_rect": [ 20.0, 137.0, 311.0, 22.0 ],
                     "saved_object_attributes": {
                         "autostart": 0,
                         "defer": 0,
+                        "node_bin_path": "",
+                        "npm_bin_path": "",
+                        "options": [ "--import=tsx" ],
                         "watch": 1
                     },
-                    "text": "node.script ${d.proxyDestFilename} @watch 1",
+                    "text": "node.script ${d.proxyDestFilename} @watch 1 @options --import=tsx",
                     "textfile": {
                         "filename": "${d.proxyDestFilename}",
                         "flags": 0,

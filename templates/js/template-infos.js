@@ -36,7 +36,7 @@ export default {
       assets: 'src/clients/node-max-assets',
       postCreateHook: async (clientName, appDirname, srcPathname, destPathname) => {
         blankLine();
-        console.log(clientName, srcPathname, destPathname);
+
         const maxTargetDirectory = await getTargetDirectory({
           message: 'Where should we create your Max patch?',
         });

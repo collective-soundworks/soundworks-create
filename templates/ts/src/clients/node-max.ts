@@ -1,5 +1,5 @@
 import '@soundworks/helpers/polyfills.js';
-import { Client } from '@soundworks/core/client.js';
+import { Client, type ClientConfig } from '@soundworks/core/client.js';
 import { loadConfig } from '@soundworks/helpers/node.js';
 import Max from 'max-api';
 
@@ -15,7 +15,7 @@ import Max from 'max-api';
  */
 
 const ENV = 'default';
-const config = loadConfig(ENV, import.meta.url);
+const config: ClientConfig = loadConfig(ENV, import.meta.url);
 const client = new Client(config);
 
 // Eventually register plugins
