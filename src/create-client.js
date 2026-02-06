@@ -1,13 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { isFunction } from '@ircam/sc-utils';
 import chalk from 'chalk';
 import prompts from 'prompts';
-import compile from 'template-literal';
 
-import {
-  getTargetDirectory,
-} from './lib/prompts.js';
 import {
   copyDir,
   getSelfPackageName,
@@ -215,38 +212,9 @@ export async function createClient(
     warn(`> aborting...`);
   }
 
-  // @todo - move this a template post-hook
   // Create sample patch and proxy file for Max node.script clients.
-  if (runtime === 'node' && clientTemplateName === 'max') {
-    blankLine();
-
-    const maxTargetDirectory = await getTargetDirectory({
-      message: 'Where should we create your Max patch?',
-    });
-
-    fs.mkdirSync(maxTargetDirectory, { recursive: true });
-
-    const srcDirname = path.dirname(srcPathname);
-    const samplePatchPathname = path.join(srcDirname, 'node-max-assets', `node-max-host.maxpat`);
-    const sampleProxyPathname = path.join(srcDirname, 'node-max-assets',`node-max-proxy.js`);
-    const patchDestFilename = `node-${name}.maxpat`;
-    const proxyDestFilename = `node-${name}.js`;
-
-    // inject proxyDestFilename into sample patch template
-    const patchTemplate = compile(fs.readFileSync(samplePatchPathname));
-    const patchContent = patchTemplate({ proxyDestFilename });
-    fs.writeFileSync(path.join(maxTargetDirectory, patchDestFilename), patchContent);
-
-    // inject "real" cwd and client file path in proxy
-    const proxyTemplate = compile(fs.readFileSync(sampleProxyPathname));
-    // relative path from max directory to application cwd
-    const relCwd = path.relative(maxTargetDirectory, dirname);
-    // relative path from max directory to "real" client file
-    const relClientPathname = path.relative(maxTargetDirectory, destPathname);
-    const proxyContent = proxyTemplate({ relCwd, relClientPathname });
-    fs.writeFileSync(path.join(maxTargetDirectory, proxyDestFilename), proxyContent);
-
-    success(`Max patch and JS proxy successfully created in "${path.relative(dirname, maxTargetDirectory)}"`);
+  if (isFunction(clientTemplateInfos.postCreateHook)) {
+    await clientTemplateInfos.postCreateHook(name, dirname, srcPathname, destPathname);
   }
 
   blankLine();
