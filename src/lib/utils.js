@@ -1,21 +1,25 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+// import { isString } from '@ircam/sc-utils';
 import chalk from 'chalk';
-import expandTilde from 'expand-tilde';
 import filenamify from 'filenamify';
 import { globSync } from 'glob';
 import JSON5 from 'json5';
-import prompts from 'prompts';
 import readdir from 'recursive-readdir';
 import YAML from 'yaml';
-
-export const ignoreFiles = ['.DS_Store', 'Thumbs.db'];
-export const onCancel = () => process.exit();
+import { packageUpSync } from 'package-up';
 
 import {
   WIZARD_DIRNAME,
+  TEMPLATE_INFO_BASENAME,
 } from './filemap.js';
+import {
+  readDatabase,
+} from '../package-database.js';
+
+export const ignoreFiles = ['.DS_Store', 'Thumbs.db'];
+export const onCancel = () => process.exit();
 
 export function getSelfVersion() {
   const { version } = JSON.parse(fs.readFileSync(path.join(WIZARD_DIRNAME, 'package.json')));
@@ -180,32 +184,57 @@ export function hasJSONConfigFile(configDirname) {
   return list.length > 0;
 }
 
-export async function getTargetDirectory({
-  message = 'Where should we create your project?',
-  targetDir = '.',
-} = {}) {
-  if (targetDir === '.') {
-    const result = await prompts([
-      {
-        type: 'text',
-        name: 'dir',
-        message: `${message} (leave blank to use current directory)`,
-      },
-    ]);
+export async function parseTemplates() {
+  const templates = readDatabase('templates');
+  const infos = [];
 
-    if (result.dir) {
-      targetDir = result.dir;
+  for (let pathname of templates) {
+    if (!fs.statSync(pathname).isDirectory()) {
+      continue;
     }
+
+    // find the package in which the template is living
+    const pkg = packageUpSync({ cwd: path.resolve(pathname, '..') });
+    const packageName = JSON.parse(fs.readFileSync(pkg)).name;
+
+    const templateInfosPathname = path.join(pathname, TEMPLATE_INFO_BASENAME);
+
+    if (!fs.existsSync(templateInfosPathname)) {
+      console.log('> no template config file found in', pathname);
+      continue;
+    }
+
+    let config = null;
+
+    try {
+      const mod = await import(templateInfosPathname);
+      config = mod.default;
+    } catch {
+      console.log(`> Invalid template config file (${templateInfosPathname})`);
+      continue;
+    }
+
+    if (typeof config.name !== 'string') {
+      console.log(`> Invalid template config file (${templateInfosPathname}): field "name" is not a string`);
+      continue;
+    }
+
+    if (!Array.isArray(config.clients)) {
+      console.log(`> Invalid template config file (${templateInfosPathname}): field "clients" is not an array`);
+      continue;
+    }
+
+    config.templatePackage = packageName;
+    config.templatePathname = pathname;
+
+    infos.push(config);
   }
 
-  // remove leading and trailing spaces, occurs when drag n drop from Finder
-  targetDir = targetDir.trim();
-  targetDir = expandTilde(targetDir);
+  if (infos.length === 0) {
+    throw new Error(`No template found in directories: ${JSON.stringify(templates)}`);
+  }
 
-  targetDir = path.isAbsolute(targetDir)
-    ? path.normalize(targetDir)
-    : path.normalize(path.join(process.cwd(), targetDir));
-
-  return targetDir;
+  return infos;
 }
+
 

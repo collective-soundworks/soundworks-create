@@ -1,22 +1,22 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { isFunction } from '@ircam/sc-utils';
 import chalk from 'chalk';
 import prompts from 'prompts';
-import compile from 'template-literal';
 
 import {
+  copyDir,
+  getSelfPackageName,
   toValidFilename,
   onCancel,
+  parseTemplates,
   readProjectConfigEntry,
   readConfigFiles,
   writeConfigFile,
-  getTargetDirectory,
 } from './lib/utils.js';
 import {
-  WIZARD_DIRNAME,
   CONFIG_DIRNAME,
-  CLIENTS_SRC_PATHNAME,
   PROJECT_FILE_PATHNAME,
 } from './lib/filemap.js';
 import {
@@ -30,7 +30,6 @@ import {
 export async function createClient(
   dirname = process.cwd(),
   configDirname = CONFIG_DIRNAME,
-  clientsSrcPathname = CLIENTS_SRC_PATHNAME,
   promptsFixtures = null,
 ) {
   title('Create client');
@@ -44,8 +43,13 @@ export async function createClient(
     prompts.inject(promptsFixtures);
   }
 
-  const language = readProjectConfigEntry(PROJECT_FILE_PATHNAME, 'language') || 'js';
-  const clientTemplates = path.join(WIZARD_DIRNAME, 'client-templates', language);
+  const templateName = readProjectConfigEntry(PROJECT_FILE_PATHNAME, 'template') || 'js';
+  const templatePackage = readProjectConfigEntry(PROJECT_FILE_PATHNAME, 'templatePackage') || getSelfPackageName();
+  const templatesInfos = await parseTemplates();
+  const currentTemplateInfos = templatesInfos.find(infos => {
+    return infos.name === templateName && infos.templatePackage === templatePackage;
+  });
+
   const someAppConfig = readConfigFiles(path.join(dirname, configDirname), 'application.{yaml,json}');
 
   if (someAppConfig.length === 0) {
@@ -82,23 +86,49 @@ export async function createClient(
     },
   ], { onCancel });
 
-  let template = 'default';
-  let isDefault = false; // for browser clients only
+  const runtimeTemplates = currentTemplateInfos.clients.filter(client => client.runtime === runtime);
 
-  const choices = runtime === 'browser'
-    ? [{ value: 'default' }, { value: 'controller' }]
-    : [{ value: 'default' }, { title: 'max (`node.script`)', value: 'max' }];
+  let clientTemplateName;
 
-  const response = await prompts([
-    {
-      type: 'select',
-      name: 'template',
-      message: 'Which template would you like to use?',
-      choices: choices,
-    },
-  ], { onCancel });
+  if (runtimeTemplates.length === 1) {
+    clientTemplateName = runtimeTemplates[0].name;
+  } else {
+    const result = await prompts([
+      {
+        type: 'select',
+        name: 'clientTemplateName',
+        message: 'Which template would you like to use?',
+        // title, description, value
+        choices: runtimeTemplates.map(template => {
+          return { value: template.name, title: template.description };
+        }),
+      },
+    ], { onCancel });
 
-  template = response.template;
+    clientTemplateName = result.clientTemplateName;
+  }
+
+  const clientTemplateInfos = runtimeTemplates.find(template => template.name === clientTemplateName);
+  const relDirname = path.dirname(clientTemplateInfos.pathname);
+  const extname = path.extname(clientTemplateInfos.pathname);
+
+  const srcPathname = path.join(
+    // absolute path of the template in the filesystem
+    currentTemplateInfos.templatePathname,
+    // where the client template is located in the template
+    clientTemplateInfos.pathname,
+  );
+
+  // if client template is a directory, extname is empty so we are ok
+  const destPathname = path.join(dirname, relDirname, `${name}${extname}`);
+  const relDestPathname = path.relative(dirname, destPathname);
+
+  if (fs.existsSync(destPathname)) {
+    warn(`file "${relDestPathname}" already exists, aborting...`);
+    return;
+  }
+
+  let isDefault = false;
 
   if (runtime === 'browser') {
     let hasDefault = false;
@@ -127,21 +157,11 @@ export async function createClient(
     }
   }
 
-  const srcPathname = path.join(clientTemplates, `${runtime}-${template}.js`);
-  const destFilename = `${name}.js`;
-  const destPathname = path.join(dirname, clientsSrcPathname, destFilename);
-  const relDestPathname = path.relative(dirname, destPathname); // for logs
-
-  if (fs.existsSync(destPathname)) {
-    warn(`file "${relDestPathname}" already exists, aborting...`);
-    return;
-  }
-
   blankLine();
   info(`Creating client "${name}" in file "${relDestPathname}"`);
   info(`name: ${chalk.cyan(name)}`);
   info(`runtime: ${chalk.cyan(runtime)}`);
-  info(`template: ${chalk.cyan(template)}`);
+  info(`template: ${chalk.cyan(clientTemplateName)}`);
 
   if (runtime === 'browser') {
     info(`default: ${chalk.cyan(isDefault)}`);
@@ -161,8 +181,14 @@ export async function createClient(
   ], { onCancel });
 
   if (confirm) {
+    // make sure the parent directory exists
     fs.mkdirSync(path.dirname(destPathname), { recursive: true });
-    fs.copyFileSync(srcPathname, destPathname);
+
+    if (fs.statSync(srcPathname).isFile()) {
+      fs.copyFileSync(srcPathname, destPathname);
+    } else {
+      await copyDir(srcPathname, destPathname);
+    }
 
     // update config file
     const config = { runtime };
@@ -187,35 +213,8 @@ export async function createClient(
   }
 
   // Create sample patch and proxy file for Max node.script clients.
-  if (runtime === 'node' && template === 'max') {
-    blankLine();
-
-    const maxTargetDirectory = await getTargetDirectory({
-      message: 'Where should we create your Max patch?',
-    });
-    console.log(maxTargetDirectory);
-    fs.mkdirSync(maxTargetDirectory, { recursive: true });
-
-    const samplePatchPathname = path.join(clientTemplates, `${runtime}-${template}-host.maxpat`);
-    const sampleProxyPathname = path.join(clientTemplates, `${runtime}-${template}-proxy.js`);
-    const patchDestFilename = `node-${name}.maxpat`;
-    const proxyDestFilename = `node-${name}.js`;
-
-    // inject proxyDestFilename into sample patch template
-    const patchTemplate = compile(fs.readFileSync(samplePatchPathname));
-    const patchContent = patchTemplate({ proxyDestFilename });
-    fs.writeFileSync(path.join(maxTargetDirectory, patchDestFilename), patchContent);
-
-    // inject "real" cwd and client file path in proxy
-    const proxyTemplate = compile(fs.readFileSync(sampleProxyPathname));
-    // relative path from max directory to application cwd
-    const relCwd = path.relative(maxTargetDirectory, dirname);
-    // relative path from max directory to "real" client file
-    const relClientPathname = path.relative(maxTargetDirectory, destPathname);
-    const proxyContent = proxyTemplate({ relCwd, relClientPathname });
-    fs.writeFileSync(path.join(maxTargetDirectory, proxyDestFilename), proxyContent);
-
-    success(`Max patch and JS proxy successfully created in "${path.relative(dirname, maxTargetDirectory)}"`);
+  if (isFunction(clientTemplateInfos.postCreateHook)) {
+    await clientTemplateInfos.postCreateHook(name, dirname, srcPathname, destPathname);
   }
 
   blankLine();

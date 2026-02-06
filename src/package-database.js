@@ -1,3 +1,10 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
+import {
+  TEMPLATES_DIRNAME,
+} from './lib/filemap.js';
+
 const generalDocumentation = {
   'soundworks general documentation': {
     doc: 'https://soundworks.dev',
@@ -46,15 +53,24 @@ const libraries = {
   },
 };
 
+const templates = fs.readdirSync(TEMPLATES_DIRNAME)
+  .map(pathname => path.join(TEMPLATES_DIRNAME, pathname))
+  .filter(pathname => fs.statSync(pathname).isDirectory());
+
 const database = {
   generalDocumentation,
   plugins,
   libraries,
+  templates,
 };
 
 export function writeDatabase(type, values, override = false) {
   if (override === false) {
-    database[type] = Object.assign(database[type], values);
+    if (Array.isArray(database[type])) {
+      database[type] = database[type].concat(values);
+    } else {
+      database[type] = Object.assign(database[type], values);
+    }
   } else {
     database[type] = values;
   }
