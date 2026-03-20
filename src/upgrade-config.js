@@ -144,8 +144,9 @@ export async function _upgradeClientDescriptionTargetToRuntime(configDirname) {
   }
 
   title('Update `ClientDescription#target` to `ClientDescription#runtime` in application.yaml');
-
+  console.log(configDirname)
   const result = readConfigFiles(configDirname, 'application.yaml');
+  console.log(result)
   const [_, config] = result[0];
 
   for (let name in config.clients) {

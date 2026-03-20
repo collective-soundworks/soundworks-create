@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 // import { isString } from '@ircam/sc-utils';
 import chalk from 'chalk';
@@ -130,9 +131,13 @@ export function writeProjectConfigEntry(projectFilePathname, key, value) {
  * return Array<Array<string, object>>
  */
 export function readConfigFiles(configDirname, glob) {
-  const list = globSync(`${configDirname}/${glob}`);
+  // https://www.npmjs.com/package/glob
+  // [!NOTE] Glob patterns should always use / as a path separator, 
+  // even on Windows systems, as \ is used to escape glob characters
+  const globPattern = path.join(configDirname, glob).replace(/\\/g, '/');
+  const list = globSync(globPattern);
   const results = [];
-
+  
   list.forEach(pathname => {
     const extname = path.extname(pathname).toLowerCase();
 
@@ -180,7 +185,11 @@ export function writeConfigFile(configDirname, filename, data) {
 }
 
 export function hasJSONConfigFile(configDirname) {
-  const list = globSync(`${configDirname}/{application,env-*}.json`);
+  // https://www.npmjs.com/package/glob
+  // [!NOTE] Glob patterns should always use / as a path separator, 
+  // even on Windows systems, as \ is used to escape glob characters
+  const globPattern = path.join(configDirname, '{application,env-*}.json').replace(/\\/g, '/');
+  const list = globSync(globPattern);
   return list.length > 0;
 }
 
@@ -205,12 +214,13 @@ export async function parseTemplates() {
     }
 
     let config = null;
-
+    
     try {
-      const mod = await import(templateInfosPathname);
+      const url = pathToFileURL(templateInfosPathname).href;
+      const mod = await import(url);
       config = mod.default;
-    } catch {
-      console.log(`> Invalid template config file (${templateInfosPathname})`);
+    } catch (err) {
+      console.log(`> Invalid template config file (${templateInfosPathname}): ${err.message}`);
       continue;
     }
 

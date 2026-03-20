@@ -21,13 +21,14 @@ describe('# packageInstaller', () => {
     }));
   });
 
-  afterEach(() => {
+  afterEach(function() {
+    this.timeout(20 * 1000);
     console.log('Clean fixtures');
     fs.rmSync(tmpDir, { force: true, recursive: true });
   });
 
   it('--install-plugins', async function() {
-    this.timeout(20 * 1000);
+    this.timeout(120 * 1000);
 
     const toInstall = [
       '@soundworks/plugin-platform-init',
@@ -46,7 +47,7 @@ describe('# packageInstaller', () => {
   });
 
   it('--install-libs', async function() {
-    this.timeout(20 * 1000);
+    this.timeout(120 * 1000);
 
     const toInstall = [
       '@ircam/sc-components',

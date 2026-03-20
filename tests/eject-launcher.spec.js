@@ -12,9 +12,9 @@ describe('# --eject-launcher', () => {
   const srcDir = path.join(tmpDir, 'node_modules', '@soundworks', 'helpers', 'browser-client');
 
   beforeEach(function() {
+    this.timeout(120 * 1000);
     console.log('Prepare fixures - Install @soundworks/helpers in', tmpDir);
 
-    this.timeout(20 * 1000);
     fs.mkdirSync(tmpDir, { recursive: true });
     fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify({
       name: 'test-eject-launcher',
@@ -22,7 +22,8 @@ describe('# --eject-launcher', () => {
     execSync('npm install @soundworks/helpers', { cwd: tmpDir, stdio: 'inherit' });
   });
 
-  afterEach(() => {
+  afterEach(function() {
+    this.timeout(40 * 1000);
     console.log('Clean fixtures');
     fs.rmSync(tmpDir, { force: true, recursive: true });
   });
