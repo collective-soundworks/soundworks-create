@@ -1,0 +1,10 @@
+name: soundworks-template
+author: the author
+clients:
+  browser-default:
+    runtime: browser
+    default: true
+  browser-controller:
+    runtime: browser
+  node-default:
+    runtime: node
