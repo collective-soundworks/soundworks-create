@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import prompts from 'prompts';
 
-import { compareVersions } from 'compare-versions';
+import semverGt from 'semver/functions/gt.js';
 
 import {
   title,
@@ -218,7 +218,7 @@ export async function upgradeConfig() {
     await _overrideLoadConfig(LOAD_CONFIG_PATHNAME);
     await _upgradeCreateVersionInProjectFile(PROJECT_FILE_PATHNAME);
 
-    if (compareVersions(coreVersion, '4.0.0-alpha.29', '>')) {
+    if (semverGt(coreVersion, '4.0.0-alpha.29')) {
       _upgradeClientDescriptionTargetToRuntime(CONFIG_DIRNAME);
       _upgradeServerEnvConfigSubpathToBaseUrl(CONFIG_DIRNAME);
     }

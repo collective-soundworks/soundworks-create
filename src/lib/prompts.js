@@ -1,7 +1,10 @@
 import path from 'node:path';
+import os from 'node:os';
 
-import expandTilde from 'expand-tilde';
 import prompts from 'prompts';
+
+const homeDirectory = os.homedir();
+const tildeCode = 126;
 
 export async function getTargetDirectory({
   message = 'Where should we create your project?',
@@ -16,14 +19,18 @@ export async function getTargetDirectory({
       },
     ]);
 
-    if (result.dir) {
-      targetDir = result.dir;
+    // do not allow directory only composed of white spaces
+    if (result.dir.trim().length > 0) {
+      targetDir = result.dir
     }
   }
 
   // remove leading and trailing spaces, occurs when drag n drop from Finder
   targetDir = targetDir.trim();
-  targetDir = expandTilde(targetDir);
+  // expand tilde
+  if (targetDir.charCodeAt(0) === tildeCode) {
+    targetDir = path.join(homeDirectory, targetDir.slice(1));
+  }
 
   targetDir = path.isAbsolute(targetDir)
     ? path.normalize(targetDir)
