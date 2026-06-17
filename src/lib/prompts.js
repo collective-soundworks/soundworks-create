@@ -21,7 +21,7 @@ export async function getTargetDirectory({
 
     // do not allow directory only composed of white spaces
     if (result.dir.trim().length > 0) {
-      targetDir = result.dir
+      targetDir = result.dir;
     }
   }
 
