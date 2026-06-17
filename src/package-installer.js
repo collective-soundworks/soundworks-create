@@ -1,6 +1,10 @@
-import { execSync } from 'node:child_process';
+import {
+  execSync,
+} from 'node:child_process';
+import {
+  styleText,
+} from 'node:util';
 
-import chalk from 'chalk';
 import prompts from 'prompts';
 
 import { readDatabase } from './package-database.js';
@@ -91,7 +95,7 @@ function packageInstaller(type, database) {
       success(`${type} successfully updated:`);
 
       if (toInstall.length > 0) {
-        toInstall.forEach(pkg => info(`${pkg}: ${chalk.cyan(database[pkg].doc)}`));
+        toInstall.forEach(pkg => info(`${pkg}: ${styleText('cyan', database[pkg].doc)}`));
       }
     } else {
       warn(`aborting...`);

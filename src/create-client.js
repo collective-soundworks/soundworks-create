@@ -1,8 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {
+  styleText,
+} from 'node:util';
 
-import { isFunction } from '@ircam/sc-utils';
-import chalk from 'chalk';
+import {
+  isFunction,
+} from '@ircam/sc-utils';
 import prompts from 'prompts';
 
 import {
@@ -159,12 +163,12 @@ export async function createClient(
 
   blankLine();
   info(`Creating client "${name}" in file "${relDestPathname}"`);
-  info(`name: ${chalk.cyan(name)}`);
-  info(`runtime: ${chalk.cyan(runtime)}`);
-  info(`template: ${chalk.cyan(clientTemplateName)}`);
+  info(`name: ${styleText('cyan', name)}`);
+  info(`runtime: ${styleText('cyan', runtime)}`);
+  info(`template: ${styleText('cyan', clientTemplateName)}`);
 
   if (runtime === 'browser') {
-    info(`default: ${chalk.cyan(isDefault)}`);
+    info(`default: ${styleText('cyan', isDefault.toString())}`);
   }
 
   blankLine();

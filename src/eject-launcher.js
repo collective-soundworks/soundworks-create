@@ -1,7 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {
+  styleText,
+} from 'node:util';
 
-import chalk from 'chalk';
 import prompts from 'prompts';
 
 import { copyDir, onCancel } from './lib/utils.js';
@@ -63,11 +65,11 @@ export async function ejectLauncher(
 
 > You can now change the default initialization views.
 > To use the ejected launcher, in your clients' \`index.js\` files, replace:
-${chalk.red(`- import launcher from '@soundworks/helpers/launcher.js'`)}
-${chalk.red(`- import loadConfig from '@soundworks/helpers/load-config.js'`)}
+${styleText('red', `- import launcher from '@soundworks/helpers/launcher.js'`)}
+${styleText('red', `- import loadConfig from '@soundworks/helpers/load-config.js'`)}
 > with
-${chalk.green(`+ import launcher from '${relative}/launcher.js'`)}
-${chalk.green(`+ import loadConfig from '${relative}/load-config.js'`)}
+${styleText('green', `+ import launcher from '${relative}/launcher.js'`)}
+${styleText('green', `+ import loadConfig from '${relative}/load-config.js'`)}
     `);
   } else {
     warn(`aborting...`);

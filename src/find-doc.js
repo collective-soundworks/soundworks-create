@@ -1,11 +1,20 @@
-import chalk from 'chalk';
+import {
+  styleText,
+} from 'node:util';
+
 import prompts from 'prompts';
 
-import { readDatabase } from './package-database.js';
-import { getPackage, onCancel } from './lib/utils.js';
+import {
+  readDatabase,
+} from './package-database.js';
+import {
+  getPackage,
+  onCancel,
+} from './lib/utils.js';
 import {
   blankLine,
 } from './lib/console.js';
+
 
 export async function findDoc(promptsFixtures = null) {
   if (promptsFixtures !== null) {
@@ -20,7 +29,7 @@ export async function findDoc(promptsFixtures = null) {
 
   for (let name in generalDocumentation) {
     console.log(`+ ${name}:`);
-    console.log(`  ${chalk.cyan(generalDocumentation[name].doc)}`);
+    console.log(`  ${styleText('cyan', generalDocumentation[name].doc)}`);
   }
 
   blankLine();
@@ -47,16 +56,16 @@ export async function findDoc(promptsFixtures = null) {
 
     if (installed.length > 0) {
       blankLine();
-      console.log(chalk.yellow(`# ${sourceName}`));
+      console.log(styleText('yellow', `# ${sourceName}`));
       blankLine();
 
       if (!showInstalledOnly) {
-        console.log(chalk.green('  [installed]'));
+        console.log(styleText('green', '  [installed]'));
       }
 
       installed.forEach(pkg => {
         console.log(`+ ${pkg}:`);
-        console.log(`  ${chalk.cyan(database[pkg].doc)}`);
+        console.log(`  ${styleText('cyan', database[pkg].doc)}`);
       });
     }
 
@@ -65,11 +74,11 @@ export async function findDoc(promptsFixtures = null) {
 
       if (notInstalled.length > 0) {
         blankLine();
-        console.log(chalk.gray('  [not installed]'));
+        console.log(styleText('gray', '  [not installed]'));
 
         notInstalled.forEach(pkg => {
-          console.log(chalk.white(`+ ${pkg}:`));
-          console.log(chalk.grey(`  ${database[pkg].doc}`));
+          console.log(styleText('white', `+ ${pkg}:`));
+          console.log(styleText('grey', `  ${database[pkg].doc}`));
         });
       }
     }

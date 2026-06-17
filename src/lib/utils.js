@@ -1,15 +1,22 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import {
+  pathToFileURL,
+} from 'node:url';
+import {
+  styleText,
+} from 'node:util';
 
-// import { isString } from '@ircam/sc-utils';
-import chalk from 'chalk';
 import filenamify from 'filenamify';
-import { globSync } from 'glob';
+import {
+  globSync,
+} from 'glob';
 import JSON5 from 'json5';
 import readdir from 'recursive-readdir';
 import YAML from 'yaml';
-import { packageUpSync } from 'package-up';
+import {
+  packageUpSync,
+} from 'package-up';
 
 import {
   WIZARD_DIRNAME,
@@ -36,7 +43,7 @@ export function isDebug() {
   let debug = false;
 
   if (process.argv[2] == '--debug' || process.argv[3] == '--debug') {
-    console.log(chalk.yellow('> Run create in debug mode'));
+    console.log(styleText('yellow', '> Run create in debug mode'));
     debug = true;
   }
 
@@ -87,7 +94,7 @@ export function getPackage(dirname = process.cwd()) {
   try {
     file = fs.readFileSync(pathname);
   } catch {
-    console.log(chalk.red(`- No package.json file found, make sure to be at the root directory of your project`));
+    console.log(styleText('red', `- No package.json file found, make sure to be at the root directory of your project`));
     console.log('');
   }
 
@@ -132,12 +139,12 @@ export function writeProjectConfigEntry(projectFilePathname, key, value) {
  */
 export function readConfigFiles(configDirname, glob) {
   // https://www.npmjs.com/package/glob
-  // [!NOTE] Glob patterns should always use / as a path separator, 
+  // [!NOTE] Glob patterns should always use / as a path separator,
   // even on Windows systems, as \ is used to escape glob characters
   const globPattern = path.join(configDirname, glob).replace(/\\/g, '/');
   const list = globSync(globPattern);
   const results = [];
-  
+
   list.forEach(pathname => {
     const extname = path.extname(pathname).toLowerCase();
 
@@ -186,7 +193,7 @@ export function writeConfigFile(configDirname, filename, data) {
 
 export function hasJSONConfigFile(configDirname) {
   // https://www.npmjs.com/package/glob
-  // [!NOTE] Glob patterns should always use / as a path separator, 
+  // [!NOTE] Glob patterns should always use / as a path separator,
   // even on Windows systems, as \ is used to escape glob characters
   const globPattern = path.join(configDirname, '{application,env-*}.json').replace(/\\/g, '/');
   const list = globSync(globPattern);
@@ -214,7 +221,7 @@ export async function parseTemplates() {
     }
 
     let config = null;
-    
+
     try {
       const url = pathToFileURL(templateInfosPathname).href;
       const mod = await import(url);

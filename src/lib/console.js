@@ -1,20 +1,26 @@
-import chalk from 'chalk';
-import { getSelfVersion } from './utils.js';
-// console
+import {
+  styleText,
+} from 'node:util';
+
+import {
+  getSelfVersion,
+} from './utils.js';
+
+
 export function title(msg) {
-  console.log(chalk.cyan(`# ${msg}`));
+  console.log(styleText('cyan', `# ${msg}`));
 }
 
 export function subtitle(msg) {
-  console.log(chalk.grey(`> ${msg}`));
+  console.log(styleText('grey', `> ${msg}`));
 }
 
 export function success(msg) {
-  console.log(chalk.green(`+ ${msg}`));
+  console.log(styleText('green', `+ ${msg}`));
 }
 
 export function warn(msg) {
-  console.log(chalk.yellow(`+ ${msg}`));
+  console.log(styleText('yellow', `+ ${msg}`));
 }
 
 export function info(msg, indent = 0) {
@@ -29,12 +35,12 @@ export function blankLine() {
 export function header() {
   const version = getSelfVersion();
   const promptHeader = `\
-${chalk.gray(`[@soundworks/create#v${version}]`)}
+${styleText('gray', `[@soundworks/create#v${version}]`)}
 
-${chalk.yellow('> welcome to soundworks')}
+${styleText('yellow', '> welcome to soundworks')}
 
-- documentation: ${chalk.cyan('https://soundworks.dev')}
-- issues: ${chalk.cyan('https://github.com/collective-soundworks/soundworks/issues')}
+- documentation: ${styleText('cyan', 'https://soundworks.dev')}
+- issues: ${styleText('cyan', 'https://github.com/collective-soundworks/soundworks/issues')}
   `;
 
   console.log(promptHeader);
