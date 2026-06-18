@@ -20,8 +20,6 @@ Aborting...
 }
 
 await cmdLineWizard(tasks);
-
 // no options given from command line, launch interactive mode
 header();
-
 await promptWizard(tasks);
