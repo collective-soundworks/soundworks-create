@@ -1,10 +1,9 @@
 import path from 'node:path';
 import fs from 'node:fs';
 
-import compile from 'template-literal';
-
 import { getTargetDirectory } from '../../src/lib/prompts.js';
 import { blankLine, success } from '../../src/lib/console.js';
+import { compileTemplate } from '../../src/lib/utils.js';
 
 export default {
   name: 'js',
@@ -50,12 +49,12 @@ export default {
         const proxyDestFilename = `node-${clientName}.js`;
 
         // inject proxyDestFilename into sample patch template
-        const patchTemplate = compile(fs.readFileSync(samplePatchPathname));
+        const patchTemplate = compileTemplate(fs.readFileSync(samplePatchPathname));
         const patchContent = patchTemplate({ proxyDestFilename });
         fs.writeFileSync(path.join(maxTargetDirectory, patchDestFilename), patchContent);
 
         // inject "real" cwd and client file path in proxy
-        const proxyTemplate = compile(fs.readFileSync(sampleProxyPathname));
+        const proxyTemplate = compileTemplate(fs.readFileSync(sampleProxyPathname));
         // relative path from max directory to application cwd
         const relCwd = path.relative(maxTargetDirectory, appDirname);
         // relative path from max directory to "real" client file

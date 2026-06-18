@@ -71,6 +71,10 @@ export function toValidFilename(input, ext = null) {
   return input;
 }
 
+export function compileTemplate(templateStr) {
+  return new Function('d', `return \`${templateStr}\``);
+}
+
 export function readDir(srcDir, ignoreFiles) {
   return fs.readdirSync(srcDir, { recursive: true, withFileTypes: true })
     .filter(dirent => dirent.isFile() && !ignoreFiles.includes(path.basename(dirent.name)))
