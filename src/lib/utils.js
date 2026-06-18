@@ -12,7 +12,6 @@ import {
   globSync,
 } from 'glob';
 import JSON5 from 'json5';
-import readdir from 'recursive-readdir';
 import YAML from 'yaml';
 import {
   packageUpSync,
@@ -26,7 +25,7 @@ import {
   readDatabase,
 } from '../package-database.js';
 
-export const ignoreFiles = ['.DS_Store', 'Thumbs.db'];
+export const ignoreFiles = ['.DS_Store', 'Thumb.db'];
 export const onCancel = () => process.exit();
 
 export function getSelfVersion() {
@@ -72,8 +71,14 @@ export function toValidFilename(input, ext = null) {
   return input;
 }
 
+export function readDir(srcDir, ignoreFiles) {
+  return fs.readdirSync(srcDir, { recursive: true, withFileTypes: true })
+    .filter(dirent => dirent.isFile() && !ignoreFiles.includes(path.basename(dirent.name)))
+    .map(dirent => path.join(dirent.parentPath, dirent.name));
+}
+
 export async function copyDir(srcDir, distDir) {
-  const files = await readdir(srcDir, ignoreFiles);
+  const files = readDir(srcDir, ignoreFiles)
 
   fs.mkdirSync(distDir, { recursive: true });
 

@@ -6,3 +6,7 @@ node_modules
 Thumb.db
 *.bak
 tests/tmp
+
+# for testing
+!tests/utils-fixtures/copy-dir/a/.DS_Store
+!tests/utils-fixtures/copy-dir/Thumb.db

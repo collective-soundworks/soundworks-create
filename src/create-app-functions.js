@@ -3,12 +3,12 @@ import fs from 'node:fs';
 import { execSync } from 'node:child_process';
 
 import prompts from 'prompts';
-import readdir from 'recursive-readdir';
 import YAML from 'yaml';
 
 import {
   toValidPackageName,
   ignoreFiles,
+  readDir,
   parseTemplates,
   onCancel,
 } from './lib/utils.js';
@@ -45,7 +45,7 @@ export async function chooseTemplate() {
 
 export async function copyTemplate(appName, templateInfos, targetWorkingDir, filesToIgnore = ignoreFiles) {
   const { templatePathname } = templateInfos;
-  const files = await readdir(templatePathname, filesToIgnore);
+  const files = readDir(templatePathname, filesToIgnore);
 
   fs.mkdirSync(targetWorkingDir, { recursive: true });
 
