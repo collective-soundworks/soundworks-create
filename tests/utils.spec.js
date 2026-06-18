@@ -17,7 +17,7 @@ describe('# Utils', () => {
     const expected = [
       'tests/utils-fixtures/copy-dir-src/b.js',
       'tests/utils-fixtures/copy-dir-src/a/a.txt'
-    ];
+    ].map(path.normalize);
 
     assert.deepEqual(await result, expected);
   });
@@ -47,9 +47,11 @@ import('../niap/test');
     await copyDir(src, dest);
 
     const result = fs.readdirSync(dest, { recursive: true });
+    const expected = ['a', 'b.js', 'a/a.txt'].map(path.normalize);
+
     fs.rmSync(dest, { recursive: true });
 
-    assert.deepEqual(result, ['a', 'b.js', 'a/a.txt']);
+    assert.deepEqual(result, expected);
   });
 
   it('## copyDir (absolute paths)', async () => {
@@ -59,9 +61,11 @@ import('../niap/test');
     await copyDir(src, dest);
 
     const result = fs.readdirSync(dest, { recursive: true });
+    const expected = ['a', 'b.js', 'a/a.txt'].map(path.normalize);
+
     fs.rmSync(dest, { recursive: true });
 
-    assert.deepEqual(result, ['a', 'b.js', 'a/a.txt']);
+    assert.deepEqual(result, expected);
   });
 
 
