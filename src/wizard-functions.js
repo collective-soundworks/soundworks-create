@@ -7,7 +7,6 @@ import { findDoc } from './find-doc.js';
 import { configInfos } from './config-infos.js';
 import { createEnv } from './create-env.js';
 import { ejectLauncher } from './eject-launcher.js';
-import { checkDeps } from './check-deps.js';
 import { upgradeConfig } from './upgrade-config.js';
 import { onCancel } from './lib/utils.js';
 import { blankLine } from './lib/console.js';
@@ -60,13 +59,6 @@ export const tasks = [
     description: 'eject the launcher and default views from `@soundworks/helpers',
     callback: ejectLauncher,
     flags: '-e, --eject-launcher',
-    launchOnInit: false,
-  },
-  {
-    name: 'checkDeps',
-    description: 'check and update your dependencies',
-    callback: checkDeps,
-    flags: '-d, --check-deps',
     launchOnInit: false,
   },
   {
