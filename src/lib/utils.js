@@ -82,7 +82,7 @@ export function readDir(srcDir, ignoreFiles) {
 }
 
 export async function copyDir(srcDir, distDir) {
-  const files = readDir(srcDir, ignoreFiles)
+  const files = readDir(srcDir, ignoreFiles);
 
   fs.mkdirSync(distDir, { recursive: true });
 
